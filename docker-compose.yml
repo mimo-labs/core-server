@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: .
+      network: bridge
+    restart: always
+    command: gunicorn -w4 -b 0.0.0.0:8000 mockserver.wsgi
+    volumes:
+      - .:/www
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+
+  mongo:
+    image: mongo:latest
+    networks:
+      - app_network
+    restart: always
+
+networks:
+  app_network:
+    driver: bridge
