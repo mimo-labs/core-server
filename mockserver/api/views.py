@@ -1,6 +1,7 @@
 import json
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 
 from core.models import Mock
@@ -14,8 +15,12 @@ class MockViewset(viewsets.ModelViewSet):
     serializer_class = MockSerializer
 
 
+@csrf_exempt
 def fetch_mock(request):
-    existing = Mock.objects.get(path=request.path)
+    try:
+        existing = Mock.objects.get(path=request.path, verb=request.method)
+    except Mock.DoesNotExist:
+        raise Http404()
     content = json.loads(existing.content)
     status_code = int(existing.status_code)
     return JsonResponse(content, status=status_code, safe=False)
