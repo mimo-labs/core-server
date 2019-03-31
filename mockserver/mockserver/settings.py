@@ -84,7 +84,9 @@ WSGI_APPLICATION = 'mockserver.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': os.environ.get('MOCK_SERVER_MONGODB_NAME', 'mocks')
+        'NAME': os.environ.get('MOCK_SERVER_MONGODB_NAME', 'mocks'),
+        'HOST': os.environ.get('MOCK_SERVER_MONGODB_HOST', 'localhost'),
+        'PORT': os.environ.get('MOCK_SERVER_MONGODB_PORT', 27017)
     }
 }
 

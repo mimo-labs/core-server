@@ -11,6 +11,8 @@ services:
       - .:/www
     ports:
       - "8000:8000"
+    environment:
+      - MOCK_SERVER_MONGODB_HOST=mongo
     networks:
       - app_network
 
