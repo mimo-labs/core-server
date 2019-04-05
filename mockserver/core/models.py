@@ -1,8 +1,6 @@
 from djongo import models
 from core import validators
 
-# Create your models here.
-
 
 class Mock(models.Model):
     path = models.CharField(

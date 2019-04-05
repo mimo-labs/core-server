@@ -26,3 +26,4 @@ sqlparse==0.2.4
 traitlets==4.3.2
 wcwidth==0.1.7
 gunicorn==19.9.0
+django-cors-headers==2.5.2
