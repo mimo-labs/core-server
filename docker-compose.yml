@@ -9,12 +9,26 @@ services:
     command: gunicorn -w4 -b 0.0.0.0:8000 mockserver.wsgi
     volumes:
       - .:/www
-    ports:
-      - "8000:8000"
+      - static_volume:/www/mockserver/static
     environment:
       - MOCK_SERVER_MONGODB_HOST=mongo
     networks:
       - app_network
+    depends_on:
+      - mongo
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    networks:
+      - app_network
+    volumes:
+      - ./conf:/etc/nginx/conf.d
+      - static_volume:/www/mockserver/static
+    ports:
+      - "12021:80"
+    depends_on:
+      - app
 
   mongo:
     image: mongo:latest
@@ -25,3 +39,6 @@ services:
 networks:
   app_network:
     driver: bridge
+
+volumes:
+  static_volume:

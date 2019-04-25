@@ -16,7 +16,7 @@ class MockViewset(viewsets.ModelViewSet):
 
 @csrf_exempt  # Para permitir POST y otros verbos
 def fetch_mock(request):
-    existing = get_object_or_404(Mock, path=request.path, verb=request.method)
+    existing = get_object_or_404(Mock, path=request.get_full_path(), verb=request.method)
     content = json.loads(existing.content)
     status_code = int(existing.status_code)
     return JsonResponse(content, status=status_code, safe=False)

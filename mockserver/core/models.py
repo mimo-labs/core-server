@@ -17,3 +17,6 @@ class Mock(models.Model):
     status_code = models.IntegerField(
         default=200
     )
+
+    def __unicode__(self):
+        return this.path
