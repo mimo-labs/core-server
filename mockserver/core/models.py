@@ -19,4 +19,4 @@ class Mock(models.Model):
     )
 
     def __unicode__(self):
-        return this.path
+        return self.path
