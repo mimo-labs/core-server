@@ -14,9 +14,15 @@ class MockViewset(viewsets.ModelViewSet):
     serializer_class = MockSerializer
 
 
-@csrf_exempt  # Para permitir POST y otros verbos
+@csrf_exempt  # This allows verbs besides GET
 def fetch_mock(request):
-    existing = get_object_or_404(Mock, path=request.get_full_path(), verb=request.method)
+    try:
+        existing = Mock.objects.filter(
+            path__startswith=request.path.rstrip('/'),
+            verb=request.method
+        ).first()
+    except Mock.DoesNotExist as e:
+        raise e
     content = json.loads(existing.content)
     status_code = int(existing.status_code)
     return JsonResponse(content, status=status_code, safe=False)
