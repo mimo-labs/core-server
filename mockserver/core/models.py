@@ -5,7 +5,8 @@ from core import validators
 class Mock(models.Model):
     path = models.CharField(
         max_length=255,
-        validators=[validators.validate_path]
+        validators=[validators.validate_path],
+        primary_key=True
     )
     verb = models.CharField(
         max_length=20,
