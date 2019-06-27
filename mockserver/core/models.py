@@ -8,7 +8,7 @@ class HeaderType(models.Model):
         primary_key=True
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -29,7 +29,7 @@ class Mock(models.Model):
         default=200
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.path
 
 
@@ -48,5 +48,5 @@ class Header(models.Model):
     def as_response_header(self):
         return self.header_type.name, self.value
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s" % (self.header_type, self.value)
