@@ -2,6 +2,16 @@ from djongo import models
 from core import validators
 
 
+class HeaderType(models.Model):
+    name = models.CharField(
+        max_length=255,
+        primary_key=True
+    )
+
+    def __unicode__(self):
+        return self.name
+
+
 class Mock(models.Model):
     path = models.CharField(
         max_length=255,
@@ -21,3 +31,22 @@ class Mock(models.Model):
 
     def __unicode__(self):
         return self.path
+
+
+class Header(models.Model):
+    header_type = models.ForeignKey(
+        HeaderType,
+        on_delete=models.CASCADE
+    )
+    value = models.TextField()
+    mock = models.ForeignKey(
+        Mock,
+        on_delete=models.CASCADE
+    )
+
+    @property
+    def as_response_header(self):
+        return self.header_type.name, self.value
+
+    def __unicode__(self):
+        return "%s: %s" % (self.header_type, self.value)
