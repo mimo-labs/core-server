@@ -13,6 +13,8 @@ class MockAdmin(admin.ModelAdmin):
         HeaderInline
     ]
 
+
 admin.site.register(HttpVerb)
+
 
 admin.site.register(HeaderType)

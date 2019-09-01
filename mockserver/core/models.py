@@ -18,6 +18,10 @@ class HttpVerb(models.Model):
         primary_key=True
     )
 
+    class Meta:
+        verbose_name = 'HTTP Verb'
+        verbose_name_plural = 'HTTP Verbs'
+
     def __str__(self):
         return self.name
 
