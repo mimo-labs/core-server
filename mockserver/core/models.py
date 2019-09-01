@@ -29,19 +29,20 @@ class Mock(models.Model):
     )
     path = models.CharField(
         max_length=955,
-        validators=[validators.validate_path]
+        validators=[validators.validate_path],
+        default='/'
     )
     params = models.TextField(
         validators=[validators.validate_json],
-        null=True,
-        blank=True
+        default='{}'
     )
     verb = models.ForeignKey(
         HttpVerb,
         on_delete=models.PROTECT
     )
     content = models.TextField(
-        validators=[validators.validate_json]
+        validators=[validators.validate_json],
+        default='{}'
     )
     status_code = models.IntegerField(
         default=200
