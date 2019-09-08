@@ -20,7 +20,7 @@ def fetch_mock(request):
     matching_mock = None
     existing = Mock.objects.filter(
         path__startswith=mock_route,
-        verb=request.method
+        verb__name=request.method
     )
 
     if not any(existing):

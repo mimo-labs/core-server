@@ -11,7 +11,7 @@ PATH_REGEX = re.compile(r"^/.*[/]*$")
 def validate_json(value):
     try:
         json.loads(value)
-    except ValueError:
+    except (ValueError, TypeError):
         raise ValidationError(
             _(f"{value} is not a valid JSON value!")
         )
