@@ -2,6 +2,11 @@
 
 Simple project to load and serve mock JSON responses, with status code, and verb discrimination.
 
+## Initial data
+
+This repository provides a fixture of common use HTTP Verbs and Headers to get started with simple mocks.
+To load it run `python manage.py loaddata initial.json`
+
 ## How to setup:
 
 ### Using Docker-Compose:
