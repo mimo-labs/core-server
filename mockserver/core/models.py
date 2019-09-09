@@ -1,4 +1,6 @@
+from django.utils.translation import gettext_lazy as _
 from djongo import models
+
 from core import validators
 
 
@@ -19,8 +21,8 @@ class HttpVerb(models.Model):
     )
 
     class Meta:
-        verbose_name = 'HTTP Verb'
-        verbose_name_plural = 'HTTP Verbs'
+        verbose_name = _('HTTP Verb')
+        verbose_name_plural = _('HTTP Verbs')
 
     def __str__(self):
         return self.name
