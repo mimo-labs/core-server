@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+install:
+  - pip install -r requirements.txt
+services:
+  - mongodb
+before_script: cd mockserver
+script:
+  - echo "starting pipeline"
+jobs:
+  include:
+    - stage: unit tests
+      script: python manage.py test --testrunner=test_settings.nodb_runner.NoDbTestRunner
+    - stage: lint
+      script: flake8
