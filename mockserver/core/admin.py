@@ -12,6 +12,7 @@ class MockAdmin(admin.ModelAdmin):
     inlines = [
         HeaderInline
     ]
+    list_display = ('title', 'path', 'is_active')
 
 
 admin.site.register(HttpVerb)
