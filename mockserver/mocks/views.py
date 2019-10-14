@@ -1,9 +1,9 @@
 import json
 
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from mocks.models import Mock
+from mocks.services import MocksFetchService
 
 # Create your views here.
 
@@ -12,37 +12,18 @@ from mocks.models import Mock
 def fetch_mock(request):
     query_params = {**request.GET.dict(), **request.POST.dict()}
     mock_route = request.path.rstrip('/')
-    matching_mock = None
-    existing = Mock.objects.filter(
-        path__startswith=mock_route,
-        verb__name=request.method
-    )
 
-    if not any(existing):
-        raise Http404()
+    mock = MocksFetchService.get_by_route_and_verb(mock_route, request.method, query_params)
 
-    if len(existing) == 1:
-        matching_mock = existing.first()
-    else:
-        for mock in existing:
-            # trim line breaks and whitespace
-            mock_params = json.loads(mock.params)
-
-            if query_params == mock_params:
-                matching_mock = mock
-                break
-        else:
-            raise Http404()
-
-    content = json.loads(matching_mock.content)
-    status_code = int(matching_mock.status_code)
+    content = json.loads(mock.content)
+    status_code = int(mock.status_code)
 
     response = JsonResponse(
         content,
         status=status_code,
         safe=False
     )
-    for header in matching_mock.header_set.all():
+    for header in mock.header_set.all():
         header_type, value = header.as_response_header
         response[header_type] = value
 
