@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
-from djongo import models
+# from djongo import models
+from django.db import models
 
 from core import validators
 
