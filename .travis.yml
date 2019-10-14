@@ -6,7 +6,13 @@ install:
   - pip install -r requirements.txt
 services:
   - mongodb
-before_script: cd mockserver
+  - postgresql
+before_script:
+  - cd mockserver
+  - psql -c 'create database mockserver_tests' -U postgres
+env:
+  global:
+      - DATABASE_URL="postgres://postgres@localhost:5432/mockserver_tests"
 script:
   - echo "starting pipeline"
 jobs:
