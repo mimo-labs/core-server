@@ -2,7 +2,10 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import viewsets
 
+from mocks.models import Mock, HeaderType, HttpVerb
+from mocks.serializers import MockSerializer, HeaderTypeSerializer, HttpVerbSerializer
 from mocks.services import MocksFetchService
 
 # Create your views here.
@@ -28,3 +31,18 @@ def fetch_mock(request):
         response[header_type] = value
 
     return response
+
+
+class MockViewset(viewsets.ModelViewSet):
+    queryset = Mock.objects.all()
+    serializer_class = MockSerializer
+
+
+class HeaderTypeViewset(viewsets.ModelViewSet):
+    queryset = HeaderType.objects.all()
+    srializer_class = HeaderTypeSerializer
+
+
+class HttpVerbViewset(viewsets.ModelViewSet):
+    queryset = HttpVerb.objects.all()
+    srializer_class = HttpVerbSerializer
