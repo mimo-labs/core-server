@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Mock, HeaderType, Header, HttpVerb
+from mocks.models import Mock, HeaderType, Header, HttpVerb
 
 
 class HeaderInline(admin.TabularInline):

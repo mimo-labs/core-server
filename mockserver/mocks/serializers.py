@@ -1,4 +1,4 @@
-from core.models import Mock
+from mocks.models import Mock
 from rest_framework import serializers
 
 

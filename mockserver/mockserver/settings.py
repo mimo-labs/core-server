@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'api',
+    'mocks',
 ]
 
 APPEND_SLASH = False
