@@ -50,9 +50,19 @@ class Mock(models.Model):
         validators=[validators.validate_json],
         default='{}'
     )
-    status_code = models.IntegerField(
-        default=200
-    )
+    status_code = models.IntegerField(default=200)
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        active_mocks = Mock.objects.filter(
+            path=self.path,
+            is_active=True
+        )
+
+        if active_mocks.exists():
+            active_mocks.update(is_active=False)
+
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
