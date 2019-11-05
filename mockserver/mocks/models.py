@@ -10,6 +10,12 @@ class Category(models.Model):
         max_length=255
     )
 
+    class Meta:
+        verbose_name_plural = _('Categories')
+
+    def __str__(self):
+        return self.name
+
 
 class Endpoint(models.Model):
     path = models.CharField(
@@ -21,6 +27,9 @@ class Endpoint(models.Model):
         'mocks.Category',
         on_delete=models.PROTECT
     )
+
+    def __str__(self):
+        return self.path
 
 
 class Content(models.Model):
