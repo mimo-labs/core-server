@@ -94,13 +94,6 @@ DATABASES = {
     'default': dj_database_url.config(
         default='postgres://mockserver:changeme@localhost:5432/mocks-api'
     )
-    # 'mocks': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': os.environ.get('MOCK_SERVER_MONGODB_NAME', 'mocks'),
-    #     'HOST': os.environ.get('MOCK_SERVER_MONGODB_HOST', 'localhost'),
-    #     'PORT': os.environ.get('MOCK_SERVER_MONGODB_PORT', 27017),
-    #     'ENFORCE_SCHEMA': False
-    # }
 }
 
 
