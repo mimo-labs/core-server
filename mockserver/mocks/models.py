@@ -1,7 +1,90 @@
 from django.utils.translation import gettext_lazy as _
-from djongo import models
+from django.db import models
+from django.contrib.postgres.fields import JSONField
 
-from core import validators
+from base.validators import validate_path
+
+
+class Category(models.Model):
+    name = models.CharField(
+        max_length=255
+    )
+
+    class Meta:
+        verbose_name_plural = _('Categories')
+
+    def __str__(self):
+        return self.name
+
+
+class Endpoint(models.Model):
+    path = models.CharField(
+        max_length=2048,
+        validators=(validate_path,),
+        default='/'
+    )
+    category = models.ForeignKey(
+        'mocks.Category',
+        on_delete=models.PROTECT
+    )
+
+    def __str__(self):
+        return self.path
+
+
+class Content(models.Model):
+    mock = models.ForeignKey(
+        'mocks.Mock',
+        on_delete=models.CASCADE
+    )
+    content = JSONField(
+        default=dict
+    )
+
+
+class Params(models.Model):
+    mock = models.ForeignKey(
+        'mocks.Mock',
+        on_delete=models.CASCADE
+    )
+    content = JSONField(
+        default=dict
+    )
+
+
+class Mock(models.Model):
+    title = models.CharField(
+        max_length=255,
+        primary_key=True
+    )
+    path = models.ForeignKey(
+        'mocks.Endpoint',
+        on_delete=models.PROTECT
+    )
+    verb = models.ForeignKey(
+        'mocks.HttpVerb',
+        on_delete=models.PROTECT
+    )
+    status_code = models.IntegerField(
+        default=200
+    )
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    def save(self, *args, **kwargs):
+        active_mocks = Mock.objects.filter(
+            path=self.path,
+            is_active=True
+        )
+
+        if active_mocks.exists():
+            active_mocks.update(is_active=False)
+
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 
 class HeaderType(models.Model):
@@ -28,54 +111,14 @@ class HttpVerb(models.Model):
         return self.name
 
 
-class Mock(models.Model):
-    title = models.CharField(
-        max_length=255,
-        primary_key=True
-    )
-    path = models.CharField(
-        max_length=955,
-        validators=[validators.validate_path],
-        default='/'
-    )
-    params = models.TextField(
-        validators=[validators.validate_json],
-        default='{}'
-    )
-    verb = models.ForeignKey(
-        HttpVerb,
-        on_delete=models.PROTECT
-    )
-    content = models.TextField(
-        validators=[validators.validate_json],
-        default='{}'
-    )
-    status_code = models.IntegerField(default=200)
-    is_active = models.BooleanField(default=True)
-
-    def save(self, *args, **kwargs):
-        active_mocks = Mock.objects.filter(
-            path=self.path,
-            is_active=True
-        )
-
-        if active_mocks.exists():
-            active_mocks.update(is_active=False)
-
-        return super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-
 class Header(models.Model):
     header_type = models.ForeignKey(
-        HeaderType,
+        'mocks.HeaderType',
         on_delete=models.CASCADE
     )
     value = models.TextField()
     mock = models.ForeignKey(
-        Mock,
+        'mocks.Mock',
         on_delete=models.CASCADE
     )
 
