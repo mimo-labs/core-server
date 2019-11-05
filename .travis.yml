@@ -5,7 +5,6 @@ python:
 install:
   - pip install -r requirements.txt
 services:
-  - mongodb
   - postgresql
 before_script:
   - cd mockserver
