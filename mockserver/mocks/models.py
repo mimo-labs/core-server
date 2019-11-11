@@ -2,10 +2,12 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+from authentication.models import TenantAwareModel
+from base.models import DateAwareModel
 from base.validators import validate_path
 
 
-class Category(models.Model):
+class Category(DateAwareModel):
     name = models.CharField(
         max_length=255
     )
@@ -17,7 +19,7 @@ class Category(models.Model):
         return self.name
 
 
-class Endpoint(models.Model):
+class Endpoint(DateAwareModel):
     path = models.CharField(
         max_length=2048,
         validators=(validate_path,),
@@ -32,7 +34,7 @@ class Endpoint(models.Model):
         return self.path
 
 
-class Content(models.Model):
+class Content(DateAwareModel):
     mock = models.ForeignKey(
         'mocks.Mock',
         on_delete=models.CASCADE
@@ -42,7 +44,7 @@ class Content(models.Model):
     )
 
 
-class Params(models.Model):
+class Params(DateAwareModel):
     mock = models.ForeignKey(
         'mocks.Mock',
         on_delete=models.CASCADE
@@ -52,7 +54,7 @@ class Params(models.Model):
     )
 
 
-class Mock(models.Model):
+class Mock(TenantAwareModel):
     title = models.CharField(
         max_length=255,
         primary_key=True
@@ -87,7 +89,7 @@ class Mock(models.Model):
         return self.title
 
 
-class HeaderType(models.Model):
+class HeaderType(DateAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -97,7 +99,7 @@ class HeaderType(models.Model):
         return self.name
 
 
-class HttpVerb(models.Model):
+class HttpVerb(DateAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -111,7 +113,7 @@ class HttpVerb(models.Model):
         return self.name
 
 
-class Header(models.Model):
+class Header(DateAwareModel):
     header_type = models.ForeignKey(
         'mocks.HeaderType',
         on_delete=models.CASCADE
