@@ -11,9 +11,10 @@ class MocksFetchService(Service):
     model = Mock.objects
 
     @classmethod
-    def get_by_route_and_verb(cls, route, verb, params):
+    def get_tenant_mocks(cls, tenant, route, verb, params):
         mock = get_object_or_404(
             Mock,
+            tenant=tenant,
             path__startswith=route,
             verb__name=verb,
             is_active=True
