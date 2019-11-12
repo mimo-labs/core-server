@@ -1,5 +1,6 @@
-from mocks.models import Mock, HeaderType, HttpVerb
 from rest_framework import serializers
+
+from mocks.models import Mock, HeaderType, HttpVerb
 
 
 class MockSerializer(serializers.ModelSerializer):
