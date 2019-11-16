@@ -3,6 +3,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from mocks.models import Content
 from mocks.services import MocksFetchService
 from tenants.utils import tenant_from_request
 
@@ -15,8 +16,11 @@ def fetch_mock(request):
 
     mock = MocksFetchService.get_tenant_mocks(tenant, mock_route, request.method, query_params)
 
-    content = json.loads(mock.content)
-    status_code = int(mock.status_code)
+    try:
+        content = json.loads(mock.content)
+    except Content.DoesNotExist:
+        content = {}
+    status_code = mock.status_code
 
     response = JsonResponse(
         content,

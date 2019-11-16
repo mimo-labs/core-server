@@ -35,9 +35,12 @@ class Endpoint(DateAwareModel):
 
 
 class Content(DateAwareModel):
-    mock = models.ForeignKey(
+    mock = models.OneToOneField(
         'mocks.Mock',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='content'
     )
     content = JSONField(
         default=dict
@@ -45,13 +48,19 @@ class Content(DateAwareModel):
 
 
 class Params(DateAwareModel):
-    mock = models.ForeignKey(
+    mock = models.OneToOneField(
         'mocks.Mock',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='params'
     )
     content = JSONField(
         default=dict
     )
+
+    class Meta:
+        verbose_name_plural = _('Params')
 
 
 class Mock(TenantAwareModel):
