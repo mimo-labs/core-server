@@ -20,7 +20,6 @@ class MocksFetchService(Service):
             is_active=True
         )
 
-        import ipdb; ipdb.set_trace()
         # trim line breaks and whitespace
         try:
             mock_params = json.loads(mock.params)
