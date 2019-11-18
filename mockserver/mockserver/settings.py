@@ -44,9 +44,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
-    'core',
+    'authentication',
     'api',
     'mocks',
+    'tenants',
 ]
 
 APPEND_SLASH = False
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'tenants.middlewares.tenant.TenantMiddleware',
 ]
 
 ROOT_URLCONF = 'mockserver.urls'

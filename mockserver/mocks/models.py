@@ -2,10 +2,11 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+from tenants.models import TenantAwareModel
 from base.validators import validate_path
 
 
-class Category(models.Model):
+class Category(TenantAwareModel):
     name = models.CharField(
         max_length=255
     )
@@ -17,7 +18,7 @@ class Category(models.Model):
         return self.name
 
 
-class Endpoint(models.Model):
+class Endpoint(TenantAwareModel):
     path = models.CharField(
         max_length=2048,
         validators=(validate_path,),
@@ -32,27 +33,36 @@ class Endpoint(models.Model):
         return self.path
 
 
-class Content(models.Model):
-    mock = models.ForeignKey(
+class Content(TenantAwareModel):
+    mock = models.OneToOneField(
         'mocks.Mock',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='content'
     )
     content = JSONField(
         default=dict
     )
 
 
-class Params(models.Model):
-    mock = models.ForeignKey(
+class Params(TenantAwareModel):
+    mock = models.OneToOneField(
         'mocks.Mock',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='params'
     )
     content = JSONField(
         default=dict
     )
 
+    class Meta:
+        verbose_name_plural = _('Params')
 
-class Mock(models.Model):
+
+class Mock(TenantAwareModel):
     title = models.CharField(
         max_length=255,
         primary_key=True
@@ -87,7 +97,7 @@ class Mock(models.Model):
         return self.title
 
 
-class HeaderType(models.Model):
+class HeaderType(TenantAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -97,7 +107,7 @@ class HeaderType(models.Model):
         return self.name
 
 
-class HttpVerb(models.Model):
+class HttpVerb(TenantAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -111,7 +121,7 @@ class HttpVerb(models.Model):
         return self.name
 
 
-class Header(models.Model):
+class Header(TenantAwareModel):
     header_type = models.ForeignKey(
         'mocks.HeaderType',
         on_delete=models.CASCADE
