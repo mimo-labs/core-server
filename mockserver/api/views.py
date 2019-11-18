@@ -3,18 +3,18 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from authentication.decorators.tenant_view import tenancy_required
 from mocks.models import Content
 from mocks.services import MockService
-from tenants.utils import tenant_from_request
 
 
 @csrf_exempt  # This allows verbs besides GET
+@tenancy_required
 def fetch_mock(request):
-    tenant = tenant_from_request(request)  # TODO: I dont like this. Auth should be pluggable
     query_params = {**request.GET.dict(), **request.POST.dict()}
     mock_route = request.path.rstrip('/')
 
-    mock = MockService.get_tenant_mocks(tenant, mock_route, request.method, query_params)
+    mock = MockService.get_tenant_mocks(request.tenant, mock_route, request.method, query_params)
 
     try:
         content = json.loads(mock.content)
