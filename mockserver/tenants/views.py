@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from mocks.models import Content
-from mocks.services import MocksFetchService
+from mocks.services import MockService
 from tenants.utils import tenant_from_request
 
 
@@ -14,7 +14,7 @@ def fetch_mock(request):
     query_params = {**request.GET.dict(), **request.POST.dict()}
     mock_route = request.path.rstrip('/')
 
-    mock = MocksFetchService.get_tenant_mocks(tenant, mock_route, request.method, query_params)
+    mock = MockService.get_tenant_mocks(tenant, mock_route, request.method, query_params)
 
     try:
         content = json.loads(mock.content)

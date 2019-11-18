@@ -7,7 +7,7 @@ from base.services import Service
 from mocks.models import Mock, Params
 
 
-class MocksFetchService(Service):
+class MockService(Service):
     model = Mock.objects
 
     @classmethod
