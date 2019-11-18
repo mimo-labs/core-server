@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from tenants.views import fetch_mock
+from api.views import fetch_mock
 
 
 urlpatterns = [

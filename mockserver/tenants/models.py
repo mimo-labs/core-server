@@ -25,3 +25,13 @@ class Tenant(DateAwareModel):
         Organization,
         on_delete=models.CASCADE
     )
+
+
+class TenantAwareModel(DateAwareModel):
+    tenant = models.ForeignKey(
+        Tenant,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        abstract = True

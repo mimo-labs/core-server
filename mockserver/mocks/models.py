@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
-from authentication.models import TenantAwareModel
+from tenants.models import TenantAwareModel
 from base.validators import validate_path
 
 
