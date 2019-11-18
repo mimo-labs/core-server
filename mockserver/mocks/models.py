@@ -3,11 +3,10 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 from authentication.models import TenantAwareModel
-from base.models import DateAwareModel
 from base.validators import validate_path
 
 
-class Category(DateAwareModel):
+class Category(TenantAwareModel):
     name = models.CharField(
         max_length=255
     )
@@ -19,7 +18,7 @@ class Category(DateAwareModel):
         return self.name
 
 
-class Endpoint(DateAwareModel):
+class Endpoint(TenantAwareModel):
     path = models.CharField(
         max_length=2048,
         validators=(validate_path,),
@@ -34,7 +33,7 @@ class Endpoint(DateAwareModel):
         return self.path
 
 
-class Content(DateAwareModel):
+class Content(TenantAwareModel):
     mock = models.OneToOneField(
         'mocks.Mock',
         on_delete=models.CASCADE,
@@ -47,7 +46,7 @@ class Content(DateAwareModel):
     )
 
 
-class Params(DateAwareModel):
+class Params(TenantAwareModel):
     mock = models.OneToOneField(
         'mocks.Mock',
         on_delete=models.CASCADE,
@@ -98,7 +97,7 @@ class Mock(TenantAwareModel):
         return self.title
 
 
-class HeaderType(DateAwareModel):
+class HeaderType(TenantAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -108,7 +107,7 @@ class HeaderType(DateAwareModel):
         return self.name
 
 
-class HttpVerb(DateAwareModel):
+class HttpVerb(TenantAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -122,7 +121,7 @@ class HttpVerb(DateAwareModel):
         return self.name
 
 
-class Header(DateAwareModel):
+class Header(TenantAwareModel):
     header_type = models.ForeignKey(
         'mocks.HeaderType',
         on_delete=models.CASCADE
