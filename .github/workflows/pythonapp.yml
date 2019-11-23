@@ -9,6 +9,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Log in to Docker Registry
+      run: |
+        docker login docker.pkg.github.com --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+      env:
+        DOCKER_USERNAME: ${{ github.actor }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
