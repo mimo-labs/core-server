@@ -1,4 +1,4 @@
-name: mockserver
+name: Testing
 
 on: [push]
 
@@ -9,12 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Log in to Docker Registry
-      run: |
-        docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
@@ -32,12 +26,3 @@ jobs:
       working-directory: ./mockserver
       run: |
         python manage.py test --testrunner=test_settings.nodb_runner.NoDbTestRunner
-    - name: Builds Docker image
-      run: |
-        docker build -t ldelelis/mockserver:${GITHUB_REF##*/} .
-    - name: Pushes built Docker image
-      run: |
-        docker push ldelelis/mockserver:${GITHUB_REF##*/}
-    - name: Logs out from Docker Registry
-      run: |
-        docker logout
