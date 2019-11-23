@@ -7,6 +7,9 @@ WORKDIR /www
 COPY requirements.txt /www/
 
 ENV LIBRARY_PATH=/lib:/usr/lib
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
