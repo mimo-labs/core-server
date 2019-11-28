@@ -15,20 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
-from rest_framework.schemas import get_schema_view
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 schema = get_schema_view(
-    title='Mocks project API',
+    openapi.Info(
+        title='Mocks project API',
+        default_version='v1'
+    ),
+    public=True
 )
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('mocks.urls')),
-    path('openapi/', schema, name='openapi-schema'),
-    path('redoc/', TemplateView.as_view(
-        template_name="redoc.html"
-    ), name="redoc"),
+    path('openapi/', schema.with_ui('redoc', cache_timeout=0), name='openapi-schema'),
     path('', include('api.urls')),
 ]

@@ -6,16 +6,35 @@ from mocks.models import Mock, HeaderType, HttpVerb
 class MockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mock
-        fields = '__all__'
+        fields = (
+            'title',
+            'path',
+            'verb',
+            'status_code',
+            'is_active',
+            'tenant',
+            'created',
+            'last_modified',
+        )
 
 
 class HeaderTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = HeaderType
-        fields = '__all__'
+        fields = (
+            'name',
+            'tenant',
+            'created',
+            'last_modified',
+        )
 
 
 class HttpVerbSerializer(serializers.ModelSerializer):
     class Meta:
         model = HttpVerb
-        fields = '__all__'
+        fields = (
+            'name',
+            'tenant',
+            'created',
+            'last_modified',
+        )

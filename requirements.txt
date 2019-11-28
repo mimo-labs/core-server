@@ -30,3 +30,4 @@ django-extensions==2.2.5
 Werkzeug==0.16.0
 coreapi==2.3.3
 PyYAML==5.1.2
+drf-yasg==1.17.0
