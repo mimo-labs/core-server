@@ -15,10 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from rest_framework.schemas import get_schema_view
+
+schema = get_schema_view(
+    title='Mocks project API',
+)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('mocks.urls')),
+    path('openapi/', schema, name='openapi-schema'),
+    path('redoc/', TemplateView.as_view(
+        template_name="redoc.html"
+    ), name="redoc"),
     path('', include('api.urls')),
 ]
