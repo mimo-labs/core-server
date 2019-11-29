@@ -12,9 +12,9 @@ class MockViewset(viewsets.ModelViewSet):
 
 class HeaderTypeViewset(viewsets.ModelViewSet):
     queryset = HeaderType.objects.all()
-    srializer_class = HeaderTypeSerializer
+    serializer_class = HeaderTypeSerializer
 
 
 class HttpVerbViewset(viewsets.ModelViewSet):
     queryset = HttpVerb.objects.all()
-    srializer_class = HttpVerbSerializer
+    serializer_class = HttpVerbSerializer
