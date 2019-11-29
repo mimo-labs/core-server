@@ -1,8 +1,17 @@
 from rest_framework import viewsets
 
-from mocks.models import Mock, HeaderType, HttpVerb
-from mocks.serializers import MockSerializer, HeaderTypeSerializer, HttpVerbSerializer
-# Create your views here.
+from mocks.models import (
+    Mock,
+    HeaderType,
+    HttpVerb,
+    Category
+)
+from mocks.serializers import (
+    MockSerializer,
+    HeaderTypeSerializer,
+    HttpVerbSerializer,
+    CategorySerializer
+)
 
 
 class MockViewset(viewsets.ModelViewSet):
@@ -18,3 +27,8 @@ class HeaderTypeViewset(viewsets.ModelViewSet):
 class HttpVerbViewset(viewsets.ModelViewSet):
     queryset = HttpVerb.objects.all()
     serializer_class = HttpVerbSerializer
+
+
+class CategoryViewset(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
