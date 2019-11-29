@@ -4,13 +4,15 @@ from mocks.models import (
     Mock,
     HeaderType,
     HttpVerb,
-    Category
+    Category,
+    Endpoint
 )
 from mocks.serializers import (
     MockSerializer,
     HeaderTypeSerializer,
     HttpVerbSerializer,
-    CategorySerializer
+    CategorySerializer,
+    EndpointSerializer
 )
 
 
@@ -32,3 +34,8 @@ class HttpVerbViewset(viewsets.ModelViewSet):
 class CategoryViewset(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class EndpointViewset(viewsets.ModelViewSet):
+    queryset = Endpoint.objects.all()
+    serializer_class = EndpointSerializer

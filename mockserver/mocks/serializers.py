@@ -4,7 +4,8 @@ from mocks.models import (
     Mock,
     HeaderType,
     HttpVerb,
-    Category
+    Category,
+    Endpoint
 )
 
 
@@ -45,4 +46,14 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'tenant',
+        )
+
+
+class EndpointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endpoint
+        fields = (
+            'tenant',
+            'path',
+            'category',
         )

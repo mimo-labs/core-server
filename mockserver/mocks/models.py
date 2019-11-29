@@ -26,6 +26,7 @@ class Endpoint(TenantAwareModel):
     )
     category = models.ForeignKey(
         'mocks.Category',
+        null=True,
         on_delete=models.PROTECT
     )
 
