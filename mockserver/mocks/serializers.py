@@ -13,8 +13,6 @@ class MockSerializer(serializers.ModelSerializer):
             'status_code',
             'is_active',
             'tenant',
-            'created',
-            'last_modified',
         )
 
 
@@ -24,8 +22,6 @@ class HeaderTypeSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'tenant',
-            'created',
-            'last_modified',
         )
 
 
@@ -35,6 +31,4 @@ class HttpVerbSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'tenant',
-            'created',
-            'last_modified',
         )
