@@ -5,7 +5,8 @@ from mocks.models import (
     HeaderType,
     HttpVerb,
     Category,
-    Endpoint
+    Endpoint,
+    Header
 )
 
 
@@ -28,6 +29,17 @@ class HeaderTypeSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'tenant',
+        )
+
+
+class HeaderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Header
+        fields = (
+            'tenant',
+            'header_type',
+            'value',
+            'mock',
         )
 
 
