@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from mocks.models import Mock, HeaderType, HttpVerb
+from mocks.models import (
+    Mock,
+    HeaderType,
+    HttpVerb,
+    Category,
+    Endpoint
+)
 
 
 class MockSerializer(serializers.ModelSerializer):
@@ -31,4 +37,23 @@ class HttpVerbSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'tenant',
+        )
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            'name',
+            'tenant',
+        )
+
+
+class EndpointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endpoint
+        fields = (
+            'tenant',
+            'path',
+            'category',
         )
