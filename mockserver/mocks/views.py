@@ -5,14 +5,16 @@ from mocks.models import (
     HeaderType,
     HttpVerb,
     Category,
-    Endpoint
+    Endpoint,
+    Header
 )
 from mocks.serializers import (
     MockSerializer,
     HeaderTypeSerializer,
     HttpVerbSerializer,
     CategorySerializer,
-    EndpointSerializer
+    EndpointSerializer,
+    HeaderSerializer
 )
 
 
@@ -24,6 +26,11 @@ class MockViewset(viewsets.ModelViewSet):
 class HeaderTypeViewset(viewsets.ModelViewSet):
     queryset = HeaderType.objects.all()
     serializer_class = HeaderTypeSerializer
+
+
+class HeaderViewset(viewsets.ModelViewSet):
+    queryset = Header.objects.all()
+    serializer_class = HeaderSerializer
 
 
 class HttpVerbViewset(viewsets.ModelViewSet):
