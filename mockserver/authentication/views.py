@@ -37,7 +37,13 @@ class Login(mixins.CreateModelMixin, viewsets.GenericViewSet):
             return JsonResponse({'token': token.key, 'id': user.id})
         except (ObjectDoesNotExist, PermissionDenied, ValidationError) as e:
             logger.warning(e)
-            return JsonResponse({'detail': 'invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {'detail': 'invalid username or password'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             logger.exception(e)
-            return JsonResponse({'detail': 'unexpected error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return JsonResponse(
+                {'detail': 'unexpected error'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
