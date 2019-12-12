@@ -19,7 +19,7 @@ class MockSerializer(serializers.ModelSerializer):
             'verb',
             'status_code',
             'is_active',
-            'tenant',
+            'organization',
         )
 
 
@@ -28,7 +28,7 @@ class HeaderTypeSerializer(serializers.ModelSerializer):
         model = HeaderType
         fields = (
             'name',
-            'tenant',
+            'organization',
         )
 
 
@@ -36,7 +36,7 @@ class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Header
         fields = (
-            'tenant',
+            'organization',
             'header_type',
             'value',
             'mock',
@@ -48,7 +48,7 @@ class HttpVerbSerializer(serializers.ModelSerializer):
         model = HttpVerb
         fields = (
             'name',
-            'tenant',
+            'organization',
         )
 
 
@@ -57,7 +57,7 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = (
             'name',
-            'tenant',
+            'organization',
         )
 
 
@@ -65,7 +65,7 @@ class EndpointSerializer(serializers.ModelSerializer):
     class Meta:
         model = Endpoint
         fields = (
-            'tenant',
+            'organization',
             'path',
             'category',
         )
