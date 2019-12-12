@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import mixins, viewsets, status
 
 from authentication.models import User
@@ -51,7 +51,7 @@ class Login(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class Logout(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = LoginSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         try:
