@@ -47,3 +47,16 @@ class Login(mixins.CreateModelMixin, viewsets.GenericViewSet):
                 {'detail': 'unexpected error'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class Logout(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = LoginSerializer
+    permission_classes = (AllowAny,)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            request.user.auth_token.delete()
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        return JsonResponse({'detail': 'account logged out successfully'})
