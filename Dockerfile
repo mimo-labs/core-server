@@ -1,21 +1,19 @@
-FROM python:3-alpine
+FROM python:3.7 as build
 
 LABEL maintainer="Lucio Delelis <ldelelis@est.frba.utn.edu.ar>"
 
-RUN mkdir /www
-WORKDIR /www
-COPY requirements.txt /www/
+COPY requirements.txt /
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
 
-ENV LIBRARY_PATH=/lib:/usr/lib
-RUN apk update && \
-    apk add --virtual build-deps gcc python-dev musl-dev && \
-    apk add postgresql-dev
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+FROM python:3.7-slim
 
+WORKDIR /usr/src/app
+COPY --from=build /wheels /wheels
+COPY --from=build /requirements.txt .
+
+RUN pip install --no-cache /wheels/*
+
+COPY . /usr/src/app
 ENV PYTHONUNBUFFERED 1
-COPY . /www/
-WORKDIR mockserver
 
-EXPOSE 12021/tcp
-
+EXPOSE 8000/tcp
