@@ -9,6 +9,10 @@ from mocks.views import (
     HeaderViewset
 )
 
+
+app_name = 'mocks'
+
+
 router = routers.SimpleRouter()
 router.register('mocks', MockViewset)
 router.register('header-types', HeaderTypeViewset)
