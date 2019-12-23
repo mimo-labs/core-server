@@ -13,6 +13,10 @@ COPY --from=build /requirements.txt .
 
 RUN pip install --no-cache /wheels/*
 
+RUN apt update && \
+    apt install -y libpq-dev && \
+    rm /var/lib/apt/lists/* -rf
+
 COPY . /usr/src/app
 ENV PYTHONUNBUFFERED 1
 
