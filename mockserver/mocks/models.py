@@ -2,11 +2,11 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
-from tenants.models import TenantAwareModel
+from tenants.models import OrganizationAwareModel
 from base.validators import validate_path
 
 
-class Category(TenantAwareModel):
+class Category(OrganizationAwareModel):
     name = models.CharField(
         max_length=255
     )
@@ -18,7 +18,7 @@ class Category(TenantAwareModel):
         return self.name
 
 
-class Endpoint(TenantAwareModel):
+class Endpoint(OrganizationAwareModel):
     path = models.CharField(
         max_length=2048,
         validators=(validate_path,),
@@ -34,7 +34,7 @@ class Endpoint(TenantAwareModel):
         return self.path
 
 
-class Content(TenantAwareModel):
+class Content(OrganizationAwareModel):
     mock = models.OneToOneField(
         'mocks.Mock',
         on_delete=models.CASCADE,
@@ -47,7 +47,7 @@ class Content(TenantAwareModel):
     )
 
 
-class Params(TenantAwareModel):
+class Params(OrganizationAwareModel):
     mock = models.OneToOneField(
         'mocks.Mock',
         on_delete=models.CASCADE,
@@ -63,7 +63,7 @@ class Params(TenantAwareModel):
         verbose_name_plural = _('Params')
 
 
-class Mock(TenantAwareModel):
+class Mock(OrganizationAwareModel):
     title = models.CharField(
         max_length=255,
         primary_key=True
@@ -98,7 +98,7 @@ class Mock(TenantAwareModel):
         return self.title
 
 
-class HeaderType(TenantAwareModel):
+class HeaderType(OrganizationAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -108,7 +108,7 @@ class HeaderType(TenantAwareModel):
         return self.name
 
 
-class HttpVerb(TenantAwareModel):
+class HttpVerb(OrganizationAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
@@ -122,7 +122,7 @@ class HttpVerb(TenantAwareModel):
         return self.name
 
 
-class Header(TenantAwareModel):
+class Header(OrganizationAwareModel):
     header_type = models.ForeignKey(
         'mocks.HeaderType',
         on_delete=models.CASCADE
