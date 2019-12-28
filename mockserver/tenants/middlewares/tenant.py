@@ -1,8 +1,3 @@
-from django.core.exceptions import ValidationError
-
-from tenants.models import (
-    Organization
-)
 from tenants.utils import tenant_from_request
 
 
