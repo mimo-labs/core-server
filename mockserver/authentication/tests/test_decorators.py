@@ -1,5 +1,4 @@
 import json
-import uuid
 from unittest.mock import Mock
 from uuid import uuid4
 
