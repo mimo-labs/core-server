@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 
-from tenants.models import Tenant
+from tenants.models import (
+    Organization
+)
 from tenants.utils import tenant_from_request
 
 
@@ -12,7 +14,7 @@ class TenantMiddleware:
         try:
             tenant_uuid = tenant_from_request(request)
             request.tenant = tenant_uuid
-        except (Tenant.DoesNotExist, ValidationError):
+        except (Organization.DoesNotExist, ValidationError):
             request.tenant = None
 
         response = self.get_response(request)

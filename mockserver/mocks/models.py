@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 from tenants.models import OrganizationAwareModel
-from base.validators import validate_path
+from common.validators import validate_path
 
 
 class Category(OrganizationAwareModel):

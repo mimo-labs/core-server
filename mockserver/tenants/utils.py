@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 
-from tenants.models import Tenant
+from tenants.models import (
+    Organization
+)
 
 
 def hostname_from_request(request):
@@ -10,7 +12,6 @@ def hostname_from_request(request):
 def tenant_from_request(request):
     hostname = hostname_from_request(request)
     tenant_prefix = hostname.split('.')[0]
-    return get_object_or_404(
-        Tenant,
-        tenant_uuid=tenant_prefix
+    return Organization.objects.get(
+        uuid=tenant_prefix
     )

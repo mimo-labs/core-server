@@ -1,10 +1,9 @@
-import json
+from django.http import (
+    Http404,
+)
 
-from django.http import Http404
-from django.shortcuts import get_object_or_404
-
-from base.services import Service
-from mocks.models import Mock, Params
+from common.services import Service
+from mocks.models import Mock
 
 
 class MockService(Service):
@@ -12,21 +11,17 @@ class MockService(Service):
 
     @classmethod
     def get_tenant_mocks(cls, tenant, route, verb, params):
-        mock = get_object_or_404(
-            Mock,
-            tenant=tenant,
-            path__path__startswith=route,
-            verb__name=verb,
-            is_active=True
-        )
-
-        # trim line breaks and whitespace
         try:
-            mock_params = json.loads(mock.params)
-        except Params.DoesNotExist:
-            mock_params = {}
+            mock = Mock.objects.get(
+                organization=tenant,
+                path__path__startswith=route,
+                verb__name=verb,
+                is_active=True
+            )
+        except Mock.DoesNotExist:
+            return None
 
-        if params != mock_params:
+        if params != mock.params.content:
             raise Http404()
 
         return mock

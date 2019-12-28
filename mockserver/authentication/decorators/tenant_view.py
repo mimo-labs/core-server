@@ -1,10 +1,14 @@
-from django.http import Http404
+from django.http import JsonResponse
+from rest_framework.status import HTTP_404_NOT_FOUND
 
 
 def tenancy_required(fn):
     def wrap(request, *args, **kwargs):
         if request.tenant is None:
-            raise Http404
+            return JsonResponse(
+                {'detail': 'organization does not exist'},
+                status=HTTP_404_NOT_FOUND
+            )
         return fn(request, *args, **kwargs)
 
     return wrap
