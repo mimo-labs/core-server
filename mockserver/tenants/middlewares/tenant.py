@@ -11,11 +11,7 @@ class TenantMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        try:
-            tenant_uuid = tenant_from_request(request)
-            request.tenant = tenant_uuid
-        except (Organization.DoesNotExist, ValidationError):
-            request.tenant = None
+        request.tenant = tenant_from_request(request)
 
         response = self.get_response(request)
         return response
