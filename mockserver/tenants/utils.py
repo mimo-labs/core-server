@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 from tenants.models import (
     Organization
 )
@@ -14,5 +16,5 @@ def tenant_from_request(request):
         return Organization.objects.get(
             uuid=tenant_prefix
         )
-    except Organization.DoesNotExist:
+    except (Organization.DoesNotExist, ValidationError):
         return None
