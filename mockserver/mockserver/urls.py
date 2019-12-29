@@ -31,6 +31,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('mocks.urls', namespace='v1'), name='api_v1'),
     path('openapi/', schema.with_ui('redoc', cache_timeout=0), name='openapi-schema'),
-    path('', include('api.urls')),
     path('', include('authentication.urls')),
+    path('', include('api.urls')),  # THIS MUST ALWAYS BE LAST
 ]
