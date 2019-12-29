@@ -8,9 +8,6 @@ from django.test import (
     TestCase,
     Client
 )
-from rest_framework.authtoken.models import Token
-
-from authentication.models import User
 
 
 class LoginViewTestCase(TestCase):
@@ -40,7 +37,8 @@ class LoginViewTestCase(TestCase):
     @patch("authentication.views.Token.objects")
     @patch('authentication.models.User.objects')
     @patch("authentication.views.authenticate")
-    def test_successful_login_returns_token_and_id(self, patch_authenticate, patch_user_manager, patch_token_manager):
+    def test_successful_login_returns_token_and_id(self, patch_authenticate, patch_user_manager,
+                                                   patch_token_manager):
         mock_user = Mock()
         mock_user.key = 'aaaaaaaaaaaaaaaaaaaaaaaaa'
         mock_user.id = 12345
