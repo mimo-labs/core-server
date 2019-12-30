@@ -158,6 +158,9 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'authentication.User'
 
 
+TEST_RUNNER = 'mockserver.test_runner.LoggingDisabledTestRunner'
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
