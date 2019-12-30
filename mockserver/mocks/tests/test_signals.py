@@ -19,8 +19,8 @@ class MockContentSignalTestCase(TestCase):
                                                            patch_content_create):
         patch_params_create.return_value = Mock()
         patch_content_create.return_value = Mock()
-        self.mock.content = None
-        self.mock.params = None
+        delattr(self.mock, "content")
+        delattr(self.mock, "params")
 
         signals.create_mock_contents('test', self.mock, self.created)
 

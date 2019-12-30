@@ -11,10 +11,12 @@ from mocks.models import (
 @receiver(post_save, sender=Mock)
 def create_mock_contents(sender, instance, created, **kwargs):
     if created:
-        instance.content = Content.objects.create(
-            mock=instance
-        )
-        instance.params = Params.objects.create(
-            mock=instance
-        )
+        if not hasattr(instance, 'content'):
+            instance.content = Content.objects.create(
+                mock=instance
+            )
+        if not hasattr(instance, 'params'):
+            instance.params = Params.objects.create(
+                mock=instance
+            )
         instance.save()
