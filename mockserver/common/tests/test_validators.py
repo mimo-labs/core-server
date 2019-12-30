@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from core.validators import validate_json, validate_path
+from common.validators import validate_json, validate_path
 
 
 class ValidatorsTestCase(TestCase):

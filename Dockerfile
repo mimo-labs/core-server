@@ -19,5 +19,3 @@ RUN apt update && \
 
 COPY . /usr/src/app
 ENV PYTHONUNBUFFERED 1
-
-EXPOSE 8000/tcp

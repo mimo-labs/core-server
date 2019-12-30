@@ -1,10 +1,8 @@
-import json
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.status import HTTP_404_NOT_FOUND
 
 from authentication.decorators.tenant_view import tenancy_required
-from mocks.models import Content
 from mocks.services import MockService
 
 
@@ -16,15 +14,15 @@ def fetch_mock(request):
 
     mock = MockService.get_tenant_mocks(request.tenant, mock_route, request.method, query_params)
 
-    try:
-        content = json.loads(mock.content)
-    except Content.DoesNotExist:
-        content = {}
-    status_code = mock.status_code
+    if mock is None:
+        return JsonResponse(
+            {'detail': 'mock does not exist'},
+            status=HTTP_404_NOT_FOUND
+        )
 
     response = JsonResponse(
-        content,
-        status=status_code,
+        mock.content.content,
+        status=mock.status_code,
         safe=False
     )
     for header in mock.header_set.all():
