@@ -18,6 +18,8 @@ class PasswordHasherMixin(object):
 
 
 admin.site.register(Organization)
+
+
 @admin.register(Tenant)
 class TenantAdmin(PasswordHasherMixin, admin.ModelAdmin):
     pass

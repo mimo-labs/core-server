@@ -16,7 +16,8 @@ class Organization(DateAwareModel):
         unique=True
     )
     users = models.ManyToManyField(
-        'tenants.Tenant'
+        'tenants.Tenant',
+        blank=True
     )
 
 

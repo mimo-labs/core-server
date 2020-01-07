@@ -1,5 +1,10 @@
+import logging
+
 from django.http import JsonResponse
 from rest_framework.status import HTTP_404_NOT_FOUND
+
+
+logger = logging.getLogger(__name__)
 
 
 def tenancy_required(fn):
