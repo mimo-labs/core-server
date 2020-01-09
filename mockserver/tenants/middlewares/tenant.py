@@ -1,4 +1,4 @@
-from tenants.utils import tenant_from_request
+from tenants.utils import organization_from_request
 
 
 class TenantMiddleware:
@@ -6,7 +6,7 @@ class TenantMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.organization = tenant_from_request(request)
+        request.organization = organization_from_request(request)
 
         response = self.get_response(request)
         return response
