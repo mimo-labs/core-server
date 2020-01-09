@@ -66,9 +66,7 @@ class LogoutViewTestCase(TestCase):
         self.user = User.objects.create(
             **self.user_data
         )
-        self.token = Token.objects.create(
-            user=self.user
-        )
+        self.token = self.user.auth_token
 
     def test_successful_logout_destroys_token(self):
         self.c.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')

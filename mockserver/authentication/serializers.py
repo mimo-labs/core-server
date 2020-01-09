@@ -3,6 +3,8 @@ from authentication.models import User
 
 
 class LoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+
     class Meta:
         model = User
         fields = [
