@@ -17,7 +17,9 @@ class PasswordHasherMixin(object):
         obj.save()
 
 
-admin.site.register(Organization)
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'uuid',)
 
 
 @admin.register(Tenant)

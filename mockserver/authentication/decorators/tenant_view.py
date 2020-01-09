@@ -15,5 +15,4 @@ def tenancy_required(fn):
                 status=HTTP_404_NOT_FOUND
             )
         return fn(request, *args, **kwargs)
-
     return wrap

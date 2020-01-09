@@ -1,9 +1,16 @@
 import logging
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import (
+    permission_classes,
+    api_view
+)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_404_NOT_FOUND
 
+from api.permissions import (
+    IsOrganizationTenantPermission
+)
 from authentication.decorators.tenant_view import tenancy_required
 from mocks.services import MockService
 
@@ -11,8 +18,9 @@ from mocks.services import MockService
 logger = logging.getLogger(__name__)
 
 
-@csrf_exempt  # This allows verbs besides GET
 @tenancy_required
+@api_view(('GET', 'POST', 'PUT', 'PATCH', 'DELETE'))
+@permission_classes((IsAuthenticated & IsOrganizationTenantPermission,))
 def fetch_mock(request):
     logger.info(f'fetch_mock tenant {request.tenant.uuid}')
 

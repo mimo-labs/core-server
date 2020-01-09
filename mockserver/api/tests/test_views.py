@@ -2,7 +2,9 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.http import JsonResponse
-from django.test import TestCase, Client
+from django.test import TestCase
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
 from mocks.models import (
     Header,
@@ -12,12 +14,19 @@ from mocks.tests.mixins import MockTestMixin
 
 
 class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        super(MockAPIFetchViewTestCase, cls).setUpClass()
+        cls.tenant = cls.create_bare_minimum_tenant()
+        cls.token = Token.objects.get(user=cls.tenant)
+
     def setUp(self):
-        self.c = Client()
+        self.mock = self.create_bare_minimum_mock(self.tenant)
+        self.c = APIClient()
+        self.c.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         self.header_type = HeaderType.objects.create(
             name="Foo"
         )
-        self.mock = self.create_bare_minimum_mock()
 
     @patch('mocks.services.MockService.get_tenant_mocks')
     def test_list_mock_is_allowed(self, patch_get_mock):
@@ -27,7 +36,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         response: JsonResponse = self.c.get(
             f'{self.mock.path.path}/',
-            HTTP_HOST=f'{self.mock.organization.uuid}.localhost'
+            HTTP_HOST=f'{self.mock.organization.uuid}.localhost',
         )
 
         self.assertIsInstance(response.json(), list)
@@ -68,3 +77,18 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         self.assertEqual(response.status_code, 404)
         self.assertDictEqual(response.json(), {'detail': 'mock does not exist'})
+
+    def test_unauthorized_tenant_returns_403(self):
+        tenant = self.create_bare_minimum_tenant()
+        self.c.credentials(HTTP_AUTHORIZATION=f'Token {tenant.auth_token}')
+
+        response = self.c.get(
+            '/some/mock',
+            HTTP_HOST=f'{self.mock.organization.uuid}.localhost'
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertDictEqual(
+            response.json(),
+            {'detail': 'You do not have permission to perform this action.'}
+        )
