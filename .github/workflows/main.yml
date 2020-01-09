@@ -37,7 +37,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
-    if: github.head_ref == 'develop' || github.head_ref == 'staging' || github.head_ref == 'master'
+    if: ${GITHUB_REF##*/} == 'develop' || ${GITHUB_REF##*/} == 'staging' || ${GITHUB_REF##*/} == 'master'
     steps:
     - uses: actions/checkout@v1
     - name: Log in to Docker Registry
