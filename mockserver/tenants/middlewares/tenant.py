@@ -6,7 +6,7 @@ class TenantMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.tenant = tenant_from_request(request)
+        request.organization = tenant_from_request(request)
 
         response = self.get_response(request)
         return response

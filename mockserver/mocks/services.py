@@ -10,10 +10,10 @@ class MockService(Service):
     model = Mock.objects
 
     @classmethod
-    def get_tenant_mocks(cls, tenant, route, verb, params):
+    def get_tenant_mocks(cls, organization, route, verb, params):
         try:
             mock = Mock.objects.get(
-                organization=tenant,
+                organization=organization,
                 path__path__startswith=route,
                 verb__name=verb,
                 is_active=True

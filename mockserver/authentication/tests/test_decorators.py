@@ -14,7 +14,7 @@ class TenancyRequiredDecoratorTestCase(TestCase):
         self.decorated_func = tenancy_required(self.fn)
 
     def test_no_tenant_returns_404_response(self):
-        self.request.tenant = None
+        self.request.organization = None
 
         response = self.decorated_func(self.request)
 
@@ -22,7 +22,7 @@ class TenancyRequiredDecoratorTestCase(TestCase):
         self.assertEqual(json.loads(response.content), {'detail': 'organization does not exist'})
 
     def test_existing_tenant_returns_wrapped_function(self):
-        self.request.tenant = uuid4()
+        self.request.organization = uuid4()
 
         self.decorated_func(self.request)
 
