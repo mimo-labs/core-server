@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def tenancy_required(fn):
     def wrap(request, *args, **kwargs):
-        if request.tenant is None:
+        if request.organization is None:
             return JsonResponse(
                 {'detail': 'organization does not exist'},
                 status=HTTP_404_NOT_FOUND

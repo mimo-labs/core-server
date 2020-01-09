@@ -22,15 +22,20 @@ logger = logging.getLogger(__name__)
 @api_view(('GET', 'POST', 'PUT', 'PATCH', 'DELETE'))
 @permission_classes((IsAuthenticated & IsOrganizationTenantPermission,))
 def fetch_mock(request):
-    logger.info(f'fetch_mock tenant {request.tenant.uuid}')
+    logger.info(f'fetch_mock organization {request.organization.uuid}')
 
     query_params = {**request.GET.dict(), **request.POST.dict()}
     mock_route = request.path.rstrip('/')
 
-    mock = MockService.get_tenant_mocks(request.tenant, mock_route, request.method, query_params)
+    mock = MockService.get_tenant_mocks(
+        request.organization,
+        mock_route,
+        request.method,
+        query_params
+    )
 
     if mock is None:
-        logger.info(f'mock not found tenant {request.tenant.uuid}')
+        logger.info(f'mock not found organization {request.organization.uuid}')
         return JsonResponse(
             {'detail': 'mock does not exist'},
             status=HTTP_404_NOT_FOUND
@@ -45,5 +50,5 @@ def fetch_mock(request):
         header_type, value = header.as_response_header
         response[header_type] = value
 
-    logger.info(f'end fetch_mock tenant {request.tenant.uuid}')
+    logger.info(f'end fetch_mock organization {request.organization.uuid}')
     return response

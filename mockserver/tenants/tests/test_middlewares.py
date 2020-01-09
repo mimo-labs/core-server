@@ -18,12 +18,12 @@ class TenantMiddlewareTestCase(TestCase):
         self.response_mock = Mock()
         self.middleware = TenantMiddleware(self.response_mock)
 
-    @patch('tenants.middlewares.tenant.tenant_from_request')
-    def test_middleware_call_always_adds_tenant_attribute(self, patch_tenant_service):
+    @patch('tenants.middlewares.tenant.organization_from_request')
+    def test_middleware_call_always_adds_organization_attribute(self, patch_tenant_service):
         patch_tenant_service.return_value = uuid4()
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
 
         self.middleware(request)
 
-        assert hasattr(request, 'tenant')
+        assert hasattr(request, 'organization')
