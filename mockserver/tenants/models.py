@@ -15,6 +15,9 @@ class Organization(DateAwareModel):
         editable=False,
         unique=True
     )
+    is_playground = models.BooleanField(
+        default=False
+    )
     users = models.ManyToManyField(
         'tenants.Tenant',
         blank=True
