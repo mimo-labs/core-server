@@ -29,7 +29,6 @@ jobs:
       with:
         python-version: 3.7
     - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         sudo apt install libpq-dev
         python -m pip install --upgrade pip
