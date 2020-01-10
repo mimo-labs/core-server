@@ -10,7 +10,7 @@ from mocks.models import (
     Header,
     HeaderType
 )
-from mocks.tests.mixins import MockTestMixin
+from common.tests.mixins import MockTestMixin
 
 
 class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
