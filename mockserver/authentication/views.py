@@ -1,4 +1,5 @@
 import logging
+from smtplib import SMTPException
 
 from django.contrib.auth import (
     authenticate,
@@ -16,7 +17,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import mixins, viewsets, status
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
-    HTTP_404_NOT_FOUND
+    HTTP_404_NOT_FOUND,
+    HTTP_503_SERVICE_UNAVAILABLE
 )
 
 from authentication import constants
@@ -100,14 +102,20 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         # TODO: define front-end url, mail format
         # TODO: Set up celery and message queue to send mails async
-        # TODO: Set up error case logging
-        send_mail(
-            constants.PASSWORD_RESET_MAIL_SUBJECT,
-            constants.PASSWORD_RESET_MESSAGE_BODY,
-            constants.PASSWORD_RESET_MAIL_SENDER,
-            (request.data['email'],),
-            fail_silently=False  # TODO: Gracefully handle SMTP error
-        )
+        try:
+            send_mail(
+                constants.PASSWORD_RESET_MAIL_SUBJECT,
+                constants.PASSWORD_RESET_MESSAGE_BODY,
+                constants.PASSWORD_RESET_MAIL_SENDER,
+                (request.data['email'],),
+                fail_silently=False
+            )
+        except SMTPException as exc:
+            logger.error(f'send mail error: {exc}')
+            return JsonResponse({'detail': str(exc).lower()}, status=HTTP_503_SERVICE_UNAVAILABLE)
+        except Exception as exc:
+            logger.exception(exc)
+            raise
         logger.info(f'reset mail sent user {request.data["email"]}')
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
 
