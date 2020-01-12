@@ -160,6 +160,9 @@ AUTH_USER_MODEL = 'authentication.User'
 
 TEST_RUNNER = 'mockserver.test_runner.LoggingDisabledTestRunner'
 
+# TODO: Configure an external smtp relay and toggle backend based on environment
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
