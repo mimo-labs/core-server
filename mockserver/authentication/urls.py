@@ -4,7 +4,8 @@ from authentication.views import (
     Login,
     Logout,
     PasswordResetRequest,
-    PasswordReset
+    PasswordReset,
+    PasswordChange
 )
 
 router = routers.SimpleRouter(trailing_slash=False)
@@ -27,6 +28,11 @@ router.register(
     r'password-reset',
     PasswordReset,
     base_name='password_reset'
+)
+router.register(
+    r'password-change',
+    PasswordChange,
+    base_name='password_change'
 )
 
 urlpatterns = router.urls

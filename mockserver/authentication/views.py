@@ -137,3 +137,18 @@ class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         logger.info(f'reset OK user {request.user.email}')
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
+
+
+class PasswordChange(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = PasswordResetSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        logger.info(f'password change user {request.user.email}')
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        logger.info(f'change OK user {request.user.email}')
+        return HttpResponse('', status=HTTP_204_NO_CONTENT)
