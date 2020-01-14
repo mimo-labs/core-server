@@ -1,10 +1,37 @@
-from rest_framework import routers
+from django.urls import path
 
-from authentication.views import Login, Logout
+from authentication.views import (
+    Login,
+    Logout,
+    PasswordResetRequest,
+    PasswordReset,
+    PasswordChange
+)
 
-
-router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'login', Login, base_name='login')
-router.register(r'logout', Logout, base_name='logout')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path(
+        '/login',
+        Login.as_view({'post': 'create'}),
+        name='login'
+    ),
+    path(
+        '/logout',
+        Logout.as_view({'post': 'create'}),
+        name='logout'
+    ),
+    path(
+        '/password-reset-request',
+        PasswordResetRequest.as_view({'post': 'create'}),
+        name='password_reset_request'
+    ),
+    path(
+        '/password-reset',
+        PasswordReset.as_view({'post': 'create'}),
+        name='password_reset'
+    ),
+    path(
+        '/password-change',
+        PasswordChange.as_view({'post': 'create'}),
+        name='password_change'
+    ),
+]

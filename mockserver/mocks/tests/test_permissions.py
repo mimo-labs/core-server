@@ -1,6 +1,5 @@
 from unittest.mock import (
     Mock,
-    PropertyMock,
     patch
 )
 
@@ -23,7 +22,6 @@ class OrganizationPermissionTestCase(TestCase, MockTestMixin):
             'organization': '99999999999999999'
         }
         self.request.user = Mock()
-        self.request.user.is_anonymous = PropertyMock()
 
     def test_anonymous_user_is_denied(self):
         self.request.user.is_anonymous = True
