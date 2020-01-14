@@ -18,7 +18,8 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_404_NOT_FOUND,
-    HTTP_503_SERVICE_UNAVAILABLE
+    HTTP_503_SERVICE_UNAVAILABLE,
+    HTTP_500_INTERNAL_SERVER_ERROR
 )
 
 from authentication import constants
@@ -115,7 +116,10 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
             return JsonResponse({'detail': str(exc).lower()}, status=HTTP_503_SERVICE_UNAVAILABLE)
         except Exception as exc:
             logger.exception(exc)
-            raise
+            return JsonResponse(
+                {'detail': 'unexpected server error'},
+                status=HTTP_500_INTERNAL_SERVER_ERROR
+            )
         logger.info(f'reset mail sent user {request.data["email"]}')
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
 
@@ -139,6 +143,8 @@ class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
 
 
+# TODO: Once the password reset view is refactored to use a non-API token
+# this view can be merged into it
 class PasswordChange(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = PasswordResetSerializer
     permission_classes = (IsAuthenticated,)
