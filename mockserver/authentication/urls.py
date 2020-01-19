@@ -10,27 +10,27 @@ from authentication.views import (
 
 urlpatterns = [
     path(
-        '/login',
+        'login',
         Login.as_view({'post': 'create'}),
         name='login'
     ),
     path(
-        '/logout',
+        'logout',
         Logout.as_view({'post': 'create'}),
         name='logout'
     ),
     path(
-        '/password-reset-request',
+        'password-reset-request',
         PasswordResetRequest.as_view({'post': 'create'}),
         name='password_reset_request'
     ),
     path(
-        '/password-reset',
+        'password-reset',
         PasswordReset.as_view({'post': 'create'}),
         name='password_reset'
     ),
     path(
-        '/password-change',
+        'password-change',
         PasswordChange.as_view({'post': 'create'}),
         name='password_change'
     ),
