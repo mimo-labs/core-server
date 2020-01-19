@@ -40,12 +40,12 @@ class User(AbstractBaseUser, PermissionsMixin):
                                   max_length=30,
                                   validators=[
                                       MinLengthValidator(limit_value=2)],
-                                  blank=False)
+                                  blank=True)
     last_name = models.CharField(_('Apellido'),
                                  max_length=30,
                                  validators=[
                                      MinLengthValidator(limit_value=2)],
-                                 blank=False)
+                                 blank=True)
     is_superuser = models.BooleanField(_('Superusuario'), default=False)
     is_staff = models.BooleanField(_('Staff'), default=False)
     is_active = models.BooleanField(_('Activo'), default=True)

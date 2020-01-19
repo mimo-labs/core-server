@@ -30,10 +30,12 @@ class MockTestMixin:
     @classmethod
     def create_bare_minimum_tenant(cls):
         random_email = ''.join(random.choices(string.ascii_lowercase, k=6))
-        return Tenant.objects.create(
+        tenant = Tenant.objects.create(
             email=f'{random_email}@localhost',
-            password='passwd'
         )
+        tenant.set_password('passwd')
+        tenant.save()
+        return tenant
 
     @classmethod
     def create_bare_minimum_organization(cls, tenant: Optional[Tenant] = None):
