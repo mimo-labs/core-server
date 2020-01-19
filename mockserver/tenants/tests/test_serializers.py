@@ -20,4 +20,3 @@ class TenantSerializerValidationTestCase(MockTestMixin, TestCase):
         new_passwd = serializer.validate_password(data['password'])
 
         self.assertNotEqual(old_password, new_passwd)
-
