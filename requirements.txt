@@ -1,9 +1,8 @@
 backcall==0.1.0
 dataclasses==0.6
 decorator==4.4.0
-Django==2.1.11
-django-cors-headers==2.5.2
-djangorestframework==3.9.2
+Django>=2.2.9
+djangorestframework==3.11.0
 entrypoints==0.3
 flake8==3.7.7
 gunicorn==19.9.0
@@ -32,3 +31,4 @@ coreapi==2.3.3
 PyYAML==5.1.2
 drf-yasg==1.17.0
 coverage==5.0.1
+django-cors-headers==3.2.1
