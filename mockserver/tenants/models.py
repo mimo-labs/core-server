@@ -6,6 +6,25 @@ from authentication.models import User
 from common.models import DateAwareModel
 
 
+class OrganizationMembership(DateAwareModel):
+    tenant = models.ForeignKey(
+        'tenants.Tenant',
+        on_delete=models.CASCADE
+    )
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE
+    )
+    is_admin = models.BooleanField(
+        default=False
+    )
+
+    class Meta:
+        unique_together = (
+            ('tenant', 'organization'),
+        )
+
+
 class Organization(DateAwareModel):
     name = models.CharField(
         max_length=255
@@ -20,6 +39,7 @@ class Organization(DateAwareModel):
     )
     users = models.ManyToManyField(
         'tenants.Tenant',
+        through=OrganizationMembership,
         blank=True
     )
 
