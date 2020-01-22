@@ -4,7 +4,7 @@ from rest_framework.test import APIRequestFactory
 from common.tests.mixins import MockTestMixin
 from tenants.permissions import (
     TenantPermission,
-    OrganizationPermission
+    IsOrganizationMemberPermission
 )
 
 
@@ -28,7 +28,7 @@ class TenantPermissionTestCase(MockTestMixin, TestCase):
 class OrganizationPermissionTestCase(MockTestMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.permission = OrganizationPermission()
+        cls.permission = IsOrganizationMemberPermission()
         cls.tenant = cls.create_bare_minimum_tenant()
         cls.organization = cls.create_bare_minimum_organization(cls.tenant)
         cls.factory = APIRequestFactory()
