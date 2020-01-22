@@ -3,7 +3,8 @@ from rest_framework import serializers
 
 from tenants.models import (
     Tenant,
-    Organization
+    Organization,
+    OrganizationMembership
 )
 
 
@@ -54,7 +55,12 @@ class OrganizationSerializer(serializers.ModelSerializer):
         organization = super(OrganizationSerializer, self).create(validated_data)
 
         tenant = self.context['request'].user.tenant
-        organization.users.add(tenant)
-        organization.save()
+        membership = OrganizationMembership(
+            tenant=tenant,
+            organization=organization,
+            is_owner=True,
+            is_admin=True
+        )
+        membership.save()
 
         return organization
