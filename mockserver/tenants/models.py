@@ -15,6 +15,9 @@ class OrganizationMembership(DateAwareModel):
         'tenants.Organization',
         on_delete=models.CASCADE
     )
+    is_owner = models.BooleanField(
+        default=False
+    )
     is_admin = models.BooleanField(
         default=False
     )
@@ -22,6 +25,7 @@ class OrganizationMembership(DateAwareModel):
     class Meta:
         unique_together = (
             ('tenant', 'organization'),
+            ('is_owner', 'organization'),
         )
 
 

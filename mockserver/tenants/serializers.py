@@ -58,6 +58,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         membership = OrganizationMembership(
             tenant=tenant,
             organization=organization,
+            is_owner=True,
             is_admin=True
         )
         membership.save()
