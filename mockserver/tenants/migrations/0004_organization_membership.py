@@ -26,11 +26,6 @@ class Migration(migrations.Migration):
                 'unique_together': {('tenant', 'organization'), ('is_owner', 'organization')},
             },
         ),
-        # migrations.AlterField(
-        #     model_name='organization',
-        #     name='users',
-        #     field=models.ManyToManyField(blank=True, through='tenants.OrganizationMembership', to='tenants.Tenant'),
-        # ),
         migrations.RemoveField(
             model_name='organization',
             name='users',

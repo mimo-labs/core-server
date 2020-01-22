@@ -45,3 +45,5 @@ class OrganizationSerializerTestCase(MockTestMixin, TestCase):
         organization = serializer.save()
 
         self.assertIn(self.tenant, organization.users.all())
+        self.assertTrue(organization.organizationmembership_set.first().is_owner)
+        self.assertTrue(organization.organizationmembership_set.first().is_admin)
