@@ -9,7 +9,9 @@ from tenants.models import (
 )
 from tenants.permissions import (
     TenantPermission,
-    OrganizationPermission
+    IsOrganizationMemberPermission,
+    IsOrganizationOwnerPermission,
+    IsOrganizationAdminOrOwnerPermission
 )
 from tenants.serializers import (
     TenantSerializer,
@@ -33,7 +35,19 @@ class TenantViewSet(viewsets.ModelViewSet):
 
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
-    permission_classes = (IsAuthenticated, OrganizationPermission,)
+
+    def get_permissions(self):
+        if self.action in ['list', 'create']:
+            return [IsAuthenticated()]
+        elif self.action == 'retrieve':
+            return [IsAuthenticated(), IsOrganizationMemberPermission()]
+        elif self.action == 'destroy':
+            return [IsAuthenticated(), IsOrganizationOwnerPermission()]
+        else:
+            return [
+                IsAuthenticated(),
+                IsOrganizationAdminOrOwnerPermission()
+            ]
 
     def get_serializer_class(self):
         if self.action == 'list':

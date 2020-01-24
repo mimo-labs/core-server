@@ -4,7 +4,9 @@ from rest_framework.test import APIRequestFactory
 from common.tests.mixins import MockTestMixin
 from tenants.permissions import (
     TenantPermission,
-    OrganizationPermission
+    IsOrganizationMemberPermission,
+    IsOrganizationOwnerPermission,
+    IsOrganizationAdminPermission
 )
 
 
@@ -28,13 +30,53 @@ class TenantPermissionTestCase(MockTestMixin, TestCase):
 class OrganizationPermissionTestCase(MockTestMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.permission = OrganizationPermission()
+        cls.permission = IsOrganizationMemberPermission()
         cls.tenant = cls.create_bare_minimum_tenant()
         cls.organization = cls.create_bare_minimum_organization(cls.tenant)
         cls.factory = APIRequestFactory()
 
     # TODO: Once models are improved tighten up permission checking
     def test_tenant_in_organization_is_allowed(self):
+        request = self.factory.delete('/some/url')
+        request.user = self.tenant.user_ptr
+
+        is_allowed = self.permission.has_object_permission(request, None, self.organization)
+
+        self.assertTrue(is_allowed)
+
+
+class OrganizationOwnerPermissionTestCase(MockTestMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.permission = IsOrganizationOwnerPermission()
+        cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.factory = APIRequestFactory()
+
+    def test_tenant_flagged_as_owner_is_allowed(self):
+        membership = self.organization.organizationmembership_set.get(tenant=self.tenant)
+        membership.is_owner = True
+        membership.save()
+        request = self.factory.delete('/some/url')
+        request.user = self.tenant.user_ptr
+
+        is_allowed = self.permission.has_object_permission(request, None, self.organization)
+
+        self.assertTrue(is_allowed)
+
+
+class OrganizationAdminPermissionTestCase(MockTestMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.permission = IsOrganizationAdminPermission()
+        cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.factory = APIRequestFactory()
+
+    def test_tenant_flagged_as_owner_is_allowed(self):
+        membership = self.organization.organizationmembership_set.get(tenant=self.tenant)
+        membership.is_admin = True
+        membership.save()
         request = self.factory.delete('/some/url')
         request.user = self.tenant.user_ptr
 
