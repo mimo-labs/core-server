@@ -11,7 +11,8 @@ from tenants.permissions import (
     TenantPermission,
     IsOrganizationMemberPermission,
     IsOrganizationOwnerPermission,
-    IsOrganizationAdminPermission
+    IsOrganizationAdminPermission,
+    IsOrganizationAdminOrOwnerPermission
 )
 from tenants.serializers import (
     TenantSerializer,
@@ -46,7 +47,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         else:
             return [
                 IsAuthenticated(),
-                IsOrganizationAdminPermission() | IsOrganizationOwnerPermission()
+                IsOrganizationAdminOrOwnerPermission()
             ]
 
     def get_serializer_class(self):

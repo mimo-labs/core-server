@@ -34,3 +34,11 @@ class IsOrganizationAdminPermission(permissions.BasePermission):
             ).is_admin
         except OrganizationMembership.DoesNotExist:
             return False
+
+
+class IsOrganizationAdminOrOwnerPermission(permissions.BasePermission):
+    def has_object_permission(self, *args):
+        return (
+            IsOrganizationOwnerPermission().has_object_permission(*args)
+            or IsOrganizationAdminPermission().has_object_permission(*args)
+        )

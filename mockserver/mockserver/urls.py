@@ -29,8 +29,7 @@ schema = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include('mocks.urls', namespace='v1'), name='mocks_v1'),
-    path('api/v1/', include('tenants.urls', namespace='v1'), name='tenants_v1'),
+    path('api/v1/', include('api.api_urls', namespace='v1')),
     path('openapi/', schema.with_ui('redoc', cache_timeout=0), name='openapi-schema'),
     path('', include('authentication.urls')),
     path('', include('api.urls')),  # THIS MUST ALWAYS BE LAST
