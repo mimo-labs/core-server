@@ -11,7 +11,6 @@ from tenants.permissions import (
     TenantPermission,
     IsOrganizationMemberPermission,
     IsOrganizationOwnerPermission,
-    IsOrganizationAdminPermission,
     IsOrganizationAdminOrOwnerPermission
 )
 from tenants.serializers import (
