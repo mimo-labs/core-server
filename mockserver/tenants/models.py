@@ -4,6 +4,18 @@ from django.db import models
 
 from authentication.models import User
 from common.models import DateAwareModel
+from tenants.tasks import mail_membership_invite
+
+
+class OrganizationAwareModel(DateAwareModel):
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    class Meta:
+        abstract = True
 
 
 class OrganizationMembership(DateAwareModel):
@@ -52,12 +64,17 @@ class Tenant(DateAwareModel, User):
     pass
 
 
-class OrganizationAwareModel(DateAwareModel):
-    organization = models.ForeignKey(
-        'tenants.Organization',
-        on_delete=models.CASCADE,
+class OrganizationInvite(OrganizationAwareModel):
+    email = models.EmailField()
+    tenant = models.ForeignKey(
+        'tenants.Tenant',
+        on_delete=models.SET_NULL,
         null=True
     )
+    is_accepted = models.BooleanField(
+        default=False
+    )
 
-    class Meta:
-        abstract = True
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            mail_membership_invite.delay(self)

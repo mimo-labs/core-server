@@ -1,5 +1,9 @@
+from django.db import transaction
 from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import (
+    viewsets,
+    status
+)
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
@@ -16,7 +20,8 @@ from tenants.permissions import (
 from tenants.serializers import (
     TenantSerializer,
     OrganizationThinSerializer,
-    OrganizationSerializer
+    OrganizationSerializer,
+    OrganizationInviteSerializer
 )
 
 
@@ -52,4 +57,28 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return OrganizationThinSerializer
+        elif self.action == "member-invite":
+            return OrganizationInviteSerializer
         return OrganizationSerializer
+
+    @transaction.atomic
+    @action(detail=True, methods=['POST'], url_path='member-invite')
+    def member_invite(self, request, pk=None):
+        organization = self.get_object()
+
+        for email in request.data['emails']:
+            try:
+                tenant = Tenant.objects.get(email=email)
+            except Tenant.DoesNotExist:
+                tenant = None
+            data = {
+                'organization': organization,
+                'email': email,
+                'tenant': tenant,
+            }
+
+            ser = self.get_serializer(data=data)
+            ser.is_valid(raise_exception=True)
+            ser.save()
+
+        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
