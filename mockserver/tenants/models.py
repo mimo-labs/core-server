@@ -59,6 +59,9 @@ class Organization(DateAwareModel):
         blank=True
     )
 
+    def __str__(self):
+        return f"{self.name} ({self.uuid})"
+
 
 class Tenant(DateAwareModel, User):
     pass
@@ -77,4 +80,5 @@ class OrganizationInvite(OrganizationAwareModel):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            mail_membership_invite.delay(self)
+            is_existing = self.tenant is not None
+            mail_membership_invite.delay(is_existing, self.email, self.organization.name)

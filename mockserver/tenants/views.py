@@ -57,7 +57,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return OrganizationThinSerializer
-        elif self.action == "member-invite":
+        elif self.action == "member_invite":
             return OrganizationInviteSerializer
         return OrganizationSerializer
 
@@ -72,7 +72,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             except Tenant.DoesNotExist:
                 tenant = None
             data = {
-                'organization': organization,
+                'organization': organization.pk,
                 'email': email,
                 'tenant': tenant,
             }
