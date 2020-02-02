@@ -74,4 +74,5 @@ class OrganizationInviteSerializer(serializers.ModelSerializer):
             'organization',
             'email',
             'tenant',
+            'from_domain',
         )

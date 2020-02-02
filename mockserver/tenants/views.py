@@ -64,6 +64,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     @action(detail=True, methods=['POST'], url_path='member-invite')
     def member_invite(self, request, pk=None):
+        from_domain = request.META['HTTP_HOST']
         organization = self.get_object()
 
         for email in request.data['emails']:
@@ -75,6 +76,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                 'organization': organization.pk,
                 'email': email,
                 'tenant': tenant,
+                'from_domain': from_domain
             }
 
             ser = self.get_serializer(data=data)

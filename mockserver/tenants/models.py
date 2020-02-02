@@ -74,6 +74,11 @@ class OrganizationInvite(OrganizationAwareModel):
         on_delete=models.SET_NULL,
         null=True
     )
+    from_domain = models.CharField(
+        max_length=256,
+        null=False,
+        default="",
+    )
     is_accepted = models.BooleanField(
         default=False
     )
