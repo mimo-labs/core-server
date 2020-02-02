@@ -3,8 +3,7 @@ from django.contrib import admin
 from tenants.models import (
     Organization,
     Tenant,
-    OrganizationInvite,
-    OrganizationMembership
+    OrganizationMembership,
 )
 
 
