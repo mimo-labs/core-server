@@ -86,4 +86,5 @@ class OrganizationInvite(OrganizationAwareModel):
     def save(self, *args, **kwargs):
         if not self.pk:
             is_existing = self.tenant is not None
-            mail_membership_invite.delay(is_existing, self.email, self.organization.name)
+            mail_membership_invite.delay(is_existing, self.email, self.organization.name,
+                                         self.from_domain)

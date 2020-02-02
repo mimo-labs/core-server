@@ -7,7 +7,7 @@ from tenants.invites import constants
 
 class UserMailingStrategy:
     @staticmethod
-    def generate_invite(email, organization_name):
+    def generate_invite(email, organization_name, from_domain):
         raise NotImplementedError()
 
     @staticmethod
@@ -20,7 +20,7 @@ class UserMailingStrategy:
 
 class RegisterUserUserMailingStrategy(UserMailingStrategy):
     @staticmethod
-    def generate_invite(email, organization_name):
+    def generate_invite(email, organization_name, from_domain):
         # TODO: implement third party smtp
         send_mail(
             constants.INVITE_EMAIL_SUBJECT_FORMAT % organization_name,
@@ -32,7 +32,7 @@ class RegisterUserUserMailingStrategy(UserMailingStrategy):
 
 class ExistingUserUserMailingStrategy(UserMailingStrategy):
     @staticmethod
-    def generate_invite(email, organization_name):
+    def generate_invite(email, organization_name, from_domain):
         # TODO: implement third party smtp
         send_mail(
             constants.INVITE_EMAIL_SUBJECT_FORMAT % organization_name,
