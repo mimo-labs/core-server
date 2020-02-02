@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.http import JsonResponse
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import (
     viewsets,
     status
@@ -17,6 +18,7 @@ from tenants.permissions import (
     IsOrganizationOwnerPermission,
     IsOrganizationAdminOrOwnerPermission
 )
+from tenants.schema import OrganizationInviteSchema
 from tenants.serializers import (
     TenantSerializer,
     OrganizationThinSerializer,
@@ -62,6 +64,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         return OrganizationSerializer
 
     @transaction.atomic
+    @swagger_auto_schema(method='post', request_body=OrganizationInviteSchema,
+                         responses={204: None})
     @action(detail=True, methods=['POST'], url_path='member-invite')
     def member_invite(self, request, pk=None):
         from_domain = request.META['HTTP_HOST']
