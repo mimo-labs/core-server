@@ -23,7 +23,11 @@ from rest_framework.status import (
 )
 
 from authentication import constants
-from authentication.models import User
+from authentication.backends import MailingTokenAuthentication
+from authentication.models import (
+    User,
+    OneOffToken
+)
 from authentication.serializers import (
     LoginSerializer,
     PasswordResetRequestSerializer,
@@ -99,7 +103,7 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
         except user_model.DoesNotExist:
             logger.info(f'user {request.data["email"]} does not exist')
             return JsonResponse({'detail': 'user does not exist'}, status=HTTP_404_NOT_FOUND)
-        new_token, _ = Token.objects.get_or_create(user=user)
+        new_token, _ = OneOffToken.objects.get_or_create(user=user)
 
         # TODO: define front-end url, mail format
         # TODO: Set up celery and message queue to send mails async
@@ -125,15 +129,12 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    authentication_classes = (MailingTokenAuthentication,)
     serializer_class = PasswordResetSerializer
     permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         logger.info(f'password reset user {request.user.email}')
-        # TODO: I don't like this. Instead of using an API token we should
-        # generate a one-off token elsewhere and validate it. This is a potential
-        # security issue
-        Token.objects.filter(user=request.user).delete()
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -143,8 +144,6 @@ class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
 
 
-# TODO: Once the password reset view is refactored to use a non-API token
-# this view can be merged into it
 class PasswordChange(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = PasswordResetSerializer
     permission_classes = (IsAuthenticated,)

@@ -1,8 +1,14 @@
+import binascii
+import os
+
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from common.models import DateAwareModel
 
 
 class UserManager(BaseUserManager):
@@ -69,3 +75,29 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'auth_user'
+
+
+class OneOffToken(DateAwareModel):
+    key = models.CharField(_("Key"), max_length=40, primary_key=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='one_off_token',
+        on_delete=models.CASCADE,
+        verbose_name=_('User'),
+    )
+
+    class Meta:
+        verbose_name = "One Off Token",
+        verbose_name_plural = "One Off Tokens"
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_key():
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def __str__(self):
+        return self.key
