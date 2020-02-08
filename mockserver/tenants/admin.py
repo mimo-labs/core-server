@@ -1,6 +1,10 @@
 from django.contrib import admin
 
-from tenants.models import Organization, Tenant
+from tenants.models import (
+    Organization,
+    Tenant,
+    OrganizationMembership,
+)
 
 
 class PasswordHasherMixin(object):
@@ -17,6 +21,10 @@ class PasswordHasherMixin(object):
         obj.save()
 
 
+class OrganizationMembershipAdmin(admin.StackedInline):
+    model = OrganizationMembership
+
+
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'uuid',)
@@ -24,4 +32,6 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(Tenant)
 class TenantAdmin(PasswordHasherMixin, admin.ModelAdmin):
-    pass
+    inlines = (
+        OrganizationMembershipAdmin,
+    )

@@ -1,5 +1,10 @@
+from django.db import transaction
 from django.http import JsonResponse
-from rest_framework import viewsets
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import (
+    viewsets,
+    status
+)
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
@@ -13,10 +18,12 @@ from tenants.permissions import (
     IsOrganizationOwnerPermission,
     IsOrganizationAdminOrOwnerPermission
 )
+from tenants.schema import OrganizationInviteSchema
 from tenants.serializers import (
     TenantSerializer,
     OrganizationThinSerializer,
-    OrganizationSerializer
+    OrganizationSerializer,
+    OrganizationInviteSerializer
 )
 
 
@@ -52,4 +59,32 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return OrganizationThinSerializer
+        elif self.action == "member_invite":
+            return OrganizationInviteSerializer
         return OrganizationSerializer
+
+    @transaction.atomic
+    @swagger_auto_schema(method='post', request_body=OrganizationInviteSchema,
+                         responses={204: None})
+    @action(detail=True, methods=['POST'], url_path='member-invite')
+    def member_invite(self, request, pk=None):
+        from_domain = request.META['HTTP_HOST']
+        organization = self.get_object()
+
+        for email in request.data['emails']:
+            try:
+                tenant = Tenant.objects.get(email=email)
+            except Tenant.DoesNotExist:
+                tenant = None
+            data = {
+                'organization': organization.pk,
+                'email': email,
+                'tenant': tenant,
+                'from_domain': from_domain
+            }
+
+            ser = self.get_serializer(data=data)
+            ser.is_valid(raise_exception=True)
+            ser.save()
+
+        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)

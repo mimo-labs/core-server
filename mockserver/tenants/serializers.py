@@ -4,7 +4,8 @@ from rest_framework import serializers
 from tenants.models import (
     Tenant,
     Organization,
-    OrganizationMembership
+    OrganizationMembership,
+    OrganizationInvite
 )
 
 
@@ -64,3 +65,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
         membership.save()
 
         return organization
+
+
+class OrganizationInviteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationInvite
+        fields = (
+            'organization',
+            'email',
+            'tenant',
+            'from_domain',
+        )

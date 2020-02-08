@@ -1,0 +1,6 @@
+INVITE_EMAIL_SUBJECT_FORMAT = "You've been invited to %s"
+INVITE_EMAIL_SENDER = "noreply@mimo.dev"
+INVITE_EMAIL_URL_PARAMS = ""
+# TODO: define with front-end
+# INVITE_EMAIL_REGISTER_URL_PARAMS = ""
+# INVITE_EMAIL_JOIN_URL_PARAMS = ""
