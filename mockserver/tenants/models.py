@@ -88,7 +88,7 @@ class Organization(DateAwareModel):
              update_fields=None):
         if not self.pk:
             self.profile = OrganizationProfile.objects.create(
-                name=self.name
+                public_name=self.name
             )
         return super(Organization, self).save(force_insert, force_update, using, update_fields)
 
