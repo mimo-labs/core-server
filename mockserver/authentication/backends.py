@@ -4,6 +4,8 @@ from rest_framework.authentication import (
     get_authorization_header
 )
 
+from django.utils.translation import ugettext_lazy as _
+
 from authentication.models import OneOffToken
 
 
