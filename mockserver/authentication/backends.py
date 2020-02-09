@@ -15,7 +15,7 @@ class MailingTokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         auth = get_authorization_header(request).split()
 
-        if not auth or auth[0].lower() != 'mailtoken':
+        if not auth or auth[0].lower().decode() != 'mailtoken':
             return None
 
         if len(auth) == 1:
@@ -40,4 +40,6 @@ class MailingTokenAuthentication(BaseAuthentication):
         if not token.user.is_active:
             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
 
-        return token.user, token
+        token.delete()
+
+        return token.user, None
