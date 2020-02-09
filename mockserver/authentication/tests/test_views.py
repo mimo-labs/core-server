@@ -125,7 +125,7 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
 
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
-    @patch('rest_framework.authtoken.models.Token.objects')
+    @patch('authentication.models.OneOffToken.objects')
     def test_new_token_is_created(self, patch_token_manager):
         patch_token_manager.get_or_create = Mock()
         patch_token_manager.get_or_create.return_value = (Mock(), Mock())
