@@ -41,16 +41,11 @@ class OrganizationMembership(DateAwareModel):
         )
 
 
-class Technology(DateAwareModel):
-    code = models.CharField(max_length=3)
-    name = models.CharField(max_length=255)
-
-
 class OrganizationProfile(models.Model):
     public_name = models.CharField(max_length=255)
     description = models.TextField(null=True)
     technologies = models.ManyToManyField(
-        'tenants.Technology',
+        'base.Technology',
         blank=True
     )
     avatar = models.ImageField(default="default.png")
@@ -84,13 +79,12 @@ class Organization(DateAwareModel):
         null=True
     )
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(self, **kwargs):
         if not self.pk:
             self.profile = OrganizationProfile.objects.create(
                 public_name=self.name
             )
-        return super(Organization, self).save(force_insert, force_update, using, update_fields)
+        return super(Organization, self).save(**kwargs)
 
     @property
     def member_count(self):

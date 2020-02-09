@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'authentication',
     'api',
+    'base',
     'mocks',
     'tenants',
 ]
