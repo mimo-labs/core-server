@@ -59,7 +59,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
     users = TenantSerializer(many=True, required=False)
     member_count = serializers.ReadOnlyField()
     mock_count = serializers.ReadOnlyField()
-    profile = OrganizationProfileSerializer()
+    profile = OrganizationProfileSerializer(required=False)
 
     class Meta:
         model = Organization
