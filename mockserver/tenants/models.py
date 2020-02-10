@@ -75,6 +75,7 @@ class Organization(DateAwareModel):
     )
     profile = models.OneToOneField(
         'tenants.OrganizationProfile',
+        related_name='organization',
         on_delete=models.CASCADE,
         null=True
     )
@@ -82,6 +83,7 @@ class Organization(DateAwareModel):
     def save(self, **kwargs):
         if not self.pk:
             self.profile = OrganizationProfile.objects.create(
+                organization=self,
                 public_name=self.name
             )
         return super(Organization, self).save(**kwargs)
