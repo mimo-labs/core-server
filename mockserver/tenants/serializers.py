@@ -56,10 +56,10 @@ class OrganizationProfileSerializer(serializers.ModelSerializer):
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
-    users = TenantSerializer(many=True, required=False)
+    users = TenantSerializer(many=True, read_only=True)
+    profile = OrganizationProfileSerializer(read_only=True)
     member_count = serializers.ReadOnlyField()
     mock_count = serializers.ReadOnlyField()
-    profile = OrganizationProfileSerializer(required=False)
 
     class Meta:
         model = Organization
@@ -75,7 +75,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'is_playground',
-            'users',
         )
 
     def create(self, validated_data):

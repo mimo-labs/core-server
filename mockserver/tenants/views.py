@@ -23,7 +23,8 @@ from tenants.serializers import (
     TenantSerializer,
     OrganizationThinSerializer,
     OrganizationSerializer,
-    OrganizationInviteSerializer
+    OrganizationInviteSerializer,
+    OrganizationProfileSerializer
 )
 
 
@@ -61,6 +62,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             return OrganizationThinSerializer
         elif self.action == "member_invite":
             return OrganizationInviteSerializer
+        elif self.action == "profile":
+            return OrganizationProfileSerializer
         return OrganizationSerializer
 
     @transaction.atomic
@@ -88,3 +91,13 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             ser.save()
 
         return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['PUT'])
+    def profile(self, request, pk=None):
+        organization: Organization = self.get_object()
+
+        serializer = self.get_serializer(organization.profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
