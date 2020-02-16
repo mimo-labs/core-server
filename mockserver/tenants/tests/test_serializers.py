@@ -35,12 +35,12 @@ class OrganizationSerializerTestCase(MockTestMixin, TestCase):
 
     def test_created_organization_automatically_adds_authenticated_user(self):
         data = {
-            'name': 'aaaaaaaaa'
+            'name': 'aaaaaaaaa',
         }
         request = self.factory.post('/some/url')
         request.user = self.tenant.user_ptr
         serializer = self.serializer(data=data, context={'request': request})
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
 
         organization = serializer.save()
 

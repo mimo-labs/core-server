@@ -34,3 +34,4 @@ coverage==5.0.1
 django-cors-headers==3.2.1
 celery==4.4.0
 redis==3.3.11
+Pillow==7.0.0

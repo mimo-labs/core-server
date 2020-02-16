@@ -1,11 +1,13 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
+from base.serializers import TechnologySerializer
 from tenants.models import (
     Tenant,
     Organization,
     OrganizationMembership,
-    OrganizationInvite
+    OrganizationInvite,
+    OrganizationProfile
 )
 
 
@@ -35,8 +37,29 @@ class OrganizationThinSerializer(serializers.ModelSerializer):
         )
 
 
+class OrganizationProfileSerializer(serializers.ModelSerializer):
+    technologies = TechnologySerializer(read_only=True, many=True)
+
+    class Meta:
+        model = OrganizationProfile
+        fields = (
+            'public_name',
+            'description',
+            'avatar',
+            'technologies',
+            'website',
+            'twitter',
+            'facebook',
+            'linkedin',
+            'instagram',
+        )
+
+
 class OrganizationSerializer(serializers.ModelSerializer):
-    users = TenantSerializer(many=True, required=False)
+    users = TenantSerializer(many=True, read_only=True)
+    profile = OrganizationProfileSerializer(read_only=True)
+    member_count = serializers.ReadOnlyField()
+    mock_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Organization
@@ -45,11 +68,13 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'name',
             'uuid',
             'is_playground',
-            'users'
+            'users',
+            'profile',
+            'member_count',
+            'mock_count',
         )
         read_only_fields = (
             'is_playground',
-            'users',
         )
 
     def create(self, validated_data):

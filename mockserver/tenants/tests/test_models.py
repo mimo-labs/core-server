@@ -3,7 +3,20 @@ from unittest import mock
 from django.test import TestCase
 
 from common.tests.mixins import MockTestMixin
-from tenants.models import OrganizationInvite
+from tenants.models import (
+    OrganizationInvite,
+    OrganizationProfile
+)
+
+
+class OrganizationModelTestCase(MockTestMixin, TestCase):
+    def test_new_organization_creates_profile(self):
+        organization = self.create_bare_minimum_organization()
+
+        self.assertIsNotNone(organization.profile)
+        self.assertEqual(OrganizationProfile.objects.count(), 1)
+        self.assertEqual(organization.profile.public_name, organization.name)
+        self.assertEqual(organization.profile.organization.pk, organization.pk)
 
 
 class OrganizationInviteModelTestCase(MockTestMixin, TestCase):

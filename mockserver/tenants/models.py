@@ -41,6 +41,21 @@ class OrganizationMembership(DateAwareModel):
         )
 
 
+class OrganizationProfile(models.Model):
+    public_name = models.CharField(max_length=255)
+    description = models.TextField(null=True)
+    technologies = models.ManyToManyField(
+        'base.Technology',
+        blank=True
+    )
+    avatar = models.ImageField(default="default.png")
+    website = models.URLField(null=True)
+    twitter = models.CharField(max_length=512, null=True)
+    facebook = models.CharField(max_length=512, null=True)
+    linkedin = models.CharField(max_length=512, null=True)
+    instagram = models.CharField(max_length=512, null=True)
+
+
 class Organization(DateAwareModel):
     name = models.CharField(
         max_length=255
@@ -58,6 +73,28 @@ class Organization(DateAwareModel):
         through=OrganizationMembership,
         blank=True
     )
+    profile = models.OneToOneField(
+        'tenants.OrganizationProfile',
+        related_name='organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    def save(self, **kwargs):
+        if not self.pk:
+            self.profile = OrganizationProfile.objects.create(
+                organization=self,
+                public_name=self.name
+            )
+        return super(Organization, self).save(**kwargs)
+
+    @property
+    def member_count(self):
+        return self.organizationmembership_set.count()
+
+    @property
+    def mock_count(self):
+        return self.mock_set.count()
 
     def __str__(self):
         return f"{self.name} ({self.uuid})"

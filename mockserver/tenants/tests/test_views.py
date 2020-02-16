@@ -1,6 +1,7 @@
 from unittest.mock import (
     patch,
-    MagicMock
+    MagicMock,
+    Mock
 )
 
 from rest_framework.reverse import reverse
@@ -33,6 +34,12 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
             self.assertEqual(response.status_code, 401)
 
+        with self.subTest('profile should be disallowed'):
+            url = reverse('v1:organization-profile', kwargs={'pk': self.organization.pk})
+            response = self.client.put(url)
+
+            self.assertEqual(response.status_code, 401)
+
     def test_authenticated_non_organization_member_requests_are_disallowed(self):
         url = reverse('v1:organization-detail', kwargs={'pk': self.organization.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
@@ -54,6 +61,12 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         with self.subTest('member invite should be disallowed'):
             url = reverse('v1:organization-member-invite', kwargs={'pk': self.organization.pk})
             response = self.client.post(url, **{'HTTP_HOST': 'foobar'})
+
+            self.assertEqual(response.status_code, 403)
+
+        with self.subTest('member invite should be disallowed'):
+            url = reverse('v1:organization-profile', kwargs={'pk': self.organization.pk})
+            response = self.client.put(url)
 
             self.assertEqual(response.status_code, 403)
 
@@ -148,3 +161,20 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b'')
         self.assertEqual(patch_serializer.call_count, len(emails))
+
+    @patch('tenants.views.OrganizationViewSet.get_serializer')
+    def test_authenticated_owner_profile_update_is_allowed(self, patch_serializer):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+        self.organization.organizationmembership_set.create(
+            organization=self.organization,
+            tenant=self.tenant,
+            is_owner=True
+        )
+        mock_serializer = Mock()
+        mock_serializer.data = {}
+        patch_serializer.return_value = mock_serializer
+        url = reverse('v1:organization-profile', kwargs={'pk': self.organization.pk})
+
+        response = self.client.put(url)
+
+        self.assertEqual(response.status_code, 200)
