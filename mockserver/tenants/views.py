@@ -97,9 +97,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST'], url_path='member-promotion')
     def member_promotion(self, request, pk=None):
+        org = self.get_object()
         data = {
             **request.data,
-            'organization': pk
+            'organization': org.pk
         }
 
         serializer = self.get_serializer(data=data)
