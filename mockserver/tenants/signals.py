@@ -3,7 +3,8 @@ from django.dispatch import receiver
 
 from tenants.models import (
     Tenant,
-    Organization
+    Organization,
+    OrganizationMembership
 )
 
 
@@ -14,4 +15,9 @@ def create_playground_organization(sender, instance=None, created=False, **kwarg
             name='Playground',
             is_playground=True
         )
-        org.users.add(instance)
+        OrganizationMembership.objects.create(
+            tenant=instance,
+            organization=org,
+            is_owner=True,
+            is_admin=True
+        )

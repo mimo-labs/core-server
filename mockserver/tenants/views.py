@@ -34,7 +34,7 @@ class TenantViewSet(viewsets.ModelViewSet):
     serializer_class = TenantSerializer
     permission_classes = (IsAuthenticated, TenantPermission,)
 
-    @action(detail=False, methods=['get', ])
+    @action(detail=False, methods=['GET', ])
     def me(self, request):
         tenant = request.user.tenant
         serializer = self.serializer_class(tenant)
