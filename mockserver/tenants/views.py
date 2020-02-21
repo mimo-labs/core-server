@@ -24,7 +24,8 @@ from tenants.serializers import (
     OrganizationThinSerializer,
     OrganizationSerializer,
     OrganizationInviteSerializer,
-    OrganizationProfileSerializer
+    OrganizationProfileSerializer,
+    OrganizationPromotionSerializer
 )
 
 
@@ -33,7 +34,7 @@ class TenantViewSet(viewsets.ModelViewSet):
     serializer_class = TenantSerializer
     permission_classes = (IsAuthenticated, TenantPermission,)
 
-    @action(detail=False, methods=['get', ])
+    @action(detail=False, methods=['GET', ])
     def me(self, request):
         tenant = request.user.tenant
         serializer = self.serializer_class(tenant)
@@ -49,7 +50,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         elif self.action == 'retrieve':
             return [IsAuthenticated(), IsOrganizationMemberPermission()]
-        elif self.action == 'destroy':
+        elif self.action in ('destroy', 'member_promotion'):
             return [IsAuthenticated(), IsOrganizationOwnerPermission()]
         else:
             return [
@@ -62,6 +63,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             return OrganizationThinSerializer
         elif self.action == "member_invite":
             return OrganizationInviteSerializer
+        elif self.action == "member_promotion":
+            return OrganizationPromotionSerializer
         elif self.action == "profile":
             return OrganizationProfileSerializer
         return OrganizationSerializer
@@ -89,6 +92,20 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             ser = self.get_serializer(data=data)
             ser.is_valid(raise_exception=True)
             ser.save()
+
+        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['POST'], url_path='member-promotion')
+    def member_promotion(self, request, pk=None):
+        org = self.get_object()
+        data = {
+            **request.data,
+            'organization': org.pk
+        }
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
 

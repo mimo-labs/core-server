@@ -10,7 +10,8 @@ from mocks.models import (
 )
 from tenants.models import (
     Organization,
-    Tenant
+    Tenant,
+    OrganizationMembership
 )
 
 
@@ -44,7 +45,10 @@ class MockTestMixin:
             uuid=uuid4()
         )
         if tenant:
-            org.users.add(tenant)
+            OrganizationMembership.objects.create(
+                organization=org,
+                tenant=tenant
+            )
 
         return org
 
