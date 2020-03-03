@@ -11,22 +11,6 @@ from tenants.models import (
 )
 
 
-class TenantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tenant
-        fields = (
-            'id',
-            'email',
-            'first_name',
-            'last_name',
-            'password'
-        )
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def validate_password(self, value: str):
-        return make_password(value)
-
-
 class OrganizationThinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
@@ -53,6 +37,25 @@ class OrganizationProfileSerializer(serializers.ModelSerializer):
             'linkedin',
             'instagram',
         )
+
+
+class TenantSerializer(serializers.ModelSerializer):
+    organizations = OrganizationThinSerializer(many=True)
+
+    class Meta:
+        model = Tenant
+        fields = (
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'password',
+            'organizations',
+        )
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate_password(self, value: str):
+        return make_password(value)
 
 
 class OrganizationSerializer(serializers.ModelSerializer):

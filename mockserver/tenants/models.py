@@ -70,6 +70,7 @@ class Organization(DateAwareModel):
     )
     users = models.ManyToManyField(
         'tenants.Tenant',
+        related_name="organizations",
         through=OrganizationMembership,
         blank=True
     )
