@@ -5,6 +5,7 @@ from django.contrib.auth import (
     authenticate,
     get_user_model
 )
+from rest_framework.settings import api_settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.http import (
@@ -129,7 +130,10 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    authentication_classes = (MailingTokenAuthentication,)
+    authentication_classes = (
+        MailingTokenAuthentication,
+        *api_settings.DEFAULT_AUTHENTICATION_CLASSES
+    )
     serializer_class = PasswordResetSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -141,19 +145,4 @@ class PasswordReset(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer.save()
 
         logger.info(f'reset OK user {request.user.email}')
-        return HttpResponse('', status=HTTP_204_NO_CONTENT)
-
-
-class PasswordChange(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = PasswordResetSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def create(self, request, *args, **kwargs):
-        logger.info(f'password change user {request.user.email}')
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        logger.info(f'change OK user {request.user.email}')
         return HttpResponse('', status=HTTP_204_NO_CONTENT)

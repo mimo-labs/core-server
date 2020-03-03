@@ -29,7 +29,7 @@ class MockTestMixin:
         )
 
     @classmethod
-    def create_bare_minimum_tenant(cls):
+    def create_bare_minimum_tenant(cls) -> Tenant:
         random_email = ''.join(random.choices(string.ascii_lowercase, k=6))
         tenant = Tenant.objects.create(
             email=f'{random_email}@localhost',
