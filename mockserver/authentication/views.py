@@ -1,5 +1,4 @@
 import logging
-from smtplib import SMTPException
 
 from django.contrib.auth import (
     authenticate,
@@ -7,7 +6,6 @@ from django.contrib.auth import (
 )
 from rest_framework.settings import api_settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.http import (
     JsonResponse,
     HttpResponse
@@ -19,11 +17,8 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_404_NOT_FOUND,
-    HTTP_503_SERVICE_UNAVAILABLE,
-    HTTP_500_INTERNAL_SERVER_ERROR
 )
 
-from authentication import constants
 from authentication.backends import MailingTokenAuthentication
 from authentication.models import (
     User,
@@ -34,6 +29,7 @@ from authentication.serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer
 )
+from authentication.tasks import mail_reset_request
 
 
 logger = logging.getLogger(__name__)
@@ -107,24 +103,7 @@ class PasswordResetRequest(mixins.CreateModelMixin, viewsets.GenericViewSet):
         new_token, _ = OneOffToken.objects.get_or_create(user=user)
 
         # TODO: define front-end url, mail format
-        # TODO: Set up celery and message queue to send mails async
-        try:
-            send_mail(
-                constants.PASSWORD_RESET_MAIL_SUBJECT,
-                constants.PASSWORD_RESET_MESSAGE_BODY,
-                constants.PASSWORD_RESET_MAIL_SENDER,
-                (request.data['email'],),
-                fail_silently=False
-            )
-        except SMTPException as exc:
-            logger.error(f'send mail error: {exc}')
-            return JsonResponse({'detail': str(exc).lower()}, status=HTTP_503_SERVICE_UNAVAILABLE)
-        except Exception as exc:
-            logger.exception(exc)
-            return JsonResponse(
-                {'detail': 'unexpected server error'},
-                status=HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        mail_reset_request.delay(request.data['email'], new_token.key)
         logger.info(f'reset mail sent user {request.data["email"]}')
         return HttpResponse('', status=HTTP_204_NO_CONTENT)
 

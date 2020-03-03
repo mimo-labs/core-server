@@ -1,5 +1,4 @@
 import json
-from smtplib import SMTPException
 from unittest.mock import (
     patch,
     Mock
@@ -15,8 +14,6 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-    HTTP_503_SERVICE_UNAVAILABLE,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_204_NO_CONTENT
 )
 from rest_framework.test import APIClient, APITestCase
@@ -126,8 +123,9 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
 
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
+    @patch('authentication.views.mail_reset_request.delay')
     @patch('authentication.models.OneOffToken.objects')
-    def test_new_token_is_created(self, patch_token_manager):
+    def test_new_token_is_created(self, patch_token_manager, _):
         patch_token_manager.get_or_create = Mock()
         patch_token_manager.get_or_create.return_value = (Mock(), Mock())
         request_data = {'email': self.user.email}
@@ -139,42 +137,19 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
 
         patch_token_manager.get_or_create.assert_called_once()
 
-    @patch('authentication.views.send_mail')
-    def test_smtp_connection_error_returns_503(self, patch_send_mail):
-        patch_send_mail.side_effect = SMTPException()
-        request_data = {'email': self.user.email}
-
-        response = self.client.post(
-            self.url,
-            data=request_data
-        )
-
-        patch_send_mail.assert_called_once()
-        self.assertEqual(response.status_code, HTTP_503_SERVICE_UNAVAILABLE)
-
-    @patch('authentication.views.send_mail')
-    def test_unexpected_error_returns_500(self, patch_send_mail):
-        patch_send_mail.side_effect = Exception()
-        request_data = {'email': self.user.email}
-
-        response = self.client.post(
-            self.url,
-            data=request_data
-        )
-
-        patch_send_mail.assert_called_once()
-        self.assertEqual(response.status_code, HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @patch('authentication.views.send_mail')
+    @patch('authentication.views.mail_reset_request.delay')
     def test_request_mail_is_sent(self, patch_send_mail):
         request_data = {'email': self.user.email}
+        token = OneOffToken.objects.create(
+            user=self.user
+        )
 
         response = self.client.post(
             self.url,
             data=request_data
         )
 
-        patch_send_mail.assert_called_once()
+        patch_send_mail.assert_called_once_with(self.user.email, token.key)
         self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
 
 

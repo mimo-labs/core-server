@@ -130,3 +130,4 @@ static/
 .idea/
 .vscode/
 .direnv/
+.vim/
