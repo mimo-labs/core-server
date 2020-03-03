@@ -11,13 +11,24 @@ from tenants.models import (
 )
 
 
-class OrganizationThinSerializer(serializers.ModelSerializer):
+class OrganizationProfileThinSerializer(serializers.ModelSerializer):
     class Meta:
+        model = OrganizationProfile
+        fields = (
+            'public_name',
+            'avatar',
+        )
+
+
+class OrganizationThinSerializer(serializers.ModelSerializer):
+    profile = OrganizationProfileThinSerializer()
+
+    class Meta:
+        depth = 1
         model = Organization
         fields = (
-            'id',
-            'name',
             'uuid',
+            'profile',
         )
 
 
