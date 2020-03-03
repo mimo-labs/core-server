@@ -5,7 +5,6 @@ from authentication.views import (
     Logout,
     PasswordResetRequest,
     PasswordReset,
-    PasswordChange
 )
 
 urlpatterns = [
@@ -28,10 +27,5 @@ urlpatterns = [
         'password-reset',
         PasswordReset.as_view({'post': 'create'}),
         name='password_reset'
-    ),
-    path(
-        'password-change',
-        PasswordChange.as_view({'post': 'create'}),
-        name='password_change'
     ),
 ]

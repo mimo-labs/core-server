@@ -13,14 +13,15 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_503_SERVICE_UNAVAILABLE,
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_204_NO_CONTENT
 )
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
-from authentication.models import User
+from authentication.models import User, OneOffToken
 from common.tests.mixins import MockTestMixin
 
 
@@ -175,3 +176,46 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
 
         patch_send_mail.assert_called_once()
         self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+
+class PasswordResetTestCase(APITestCase, MockTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = reverse('password_reset')
+        cls.tenant = cls.create_bare_minimum_tenant()
+
+    def test_regular_token_is_allowed(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+        request_data = {'new_password': 'foobarbaz'}
+
+        response = self.client.post(
+            self.url,
+            data=request_data,
+        )
+
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_one_off_token_is_allowed(self):
+        one_off_token = OneOffToken.objects.create(
+            user=self.tenant.user_ptr
+        )
+        self.client.credentials(HTTP_AUTHORIZATION=f'MailToken {one_off_token.key}')
+        request_data = {'new_password': 'foobarbaz'}
+
+        response = self.client.post(
+            self.url,
+            data=request_data
+        )
+
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_unauthenticated_request_is_disallowed(self):
+        request_data = {'new_password': 'foobarbaz'}
+
+        response = self.client.post(
+            self.url,
+            data=request_data
+        )
+
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
