@@ -54,9 +54,9 @@ class OrganizationPermissionTestCase(TestCase, MockTestMixin):
     def test_user_included_in_organization_is_allowed(self):
         tenant = self.create_bare_minimum_tenant()
         self.request.user = tenant
-        self.request.data['organization'] = tenant.organization_set.first().id
+        self.request.data['organization'] = tenant.organizations.first().id
         mock_org = Mock(wraps=Organization.objects)
-        mock_org.get.return_value = tenant.organization_set.first()
+        mock_org.get.return_value = tenant.organizations.first()
 
         result = self.permission_class.has_permission(self.request, None)
 
