@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 
+from mocks.filters import MockFilterSet
 from mocks.models import (
     Mock,
     HeaderType,
@@ -23,6 +24,7 @@ class MockViewset(viewsets.ModelViewSet):
     queryset = Mock.objects.all()
     serializer_class = MockSerializer
     permission_classes = (IsOwnOrganization,)
+    filter_class = MockFilterSet
 
 
 class HeaderTypeViewset(viewsets.ModelViewSet):

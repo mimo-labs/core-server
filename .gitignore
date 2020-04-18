@@ -131,3 +131,4 @@ static/
 .vscode/
 .direnv/
 .vim/
+tags
