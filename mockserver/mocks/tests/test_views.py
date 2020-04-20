@@ -23,12 +23,12 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
 
         self.assertEqual(401, response.status_code)
 
-    def test_unauthenticated_list_is_allowed(self):
+    def test_unauthenticated_list_request_is_disallowed(self):
         url = reverse('v1:mock-list')
 
         response = self.c.get(url)
 
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(401, response.status_code)
 
     def test_user_not_in_mock_organization_is_disallowed(self):
         other_tenant = self.create_bare_minimum_tenant()
