@@ -24,9 +24,10 @@ class MockTestMixin:
 
     @classmethod
     def create_bare_minimum_verb(cls):
-        return HttpVerb.objects.create(
+        verb, _ = HttpVerb.objects.get_or_create(
             name="GET"
         )
+        return verb
 
     @classmethod
     def create_bare_minimum_tenant(cls) -> Tenant:
@@ -55,7 +56,7 @@ class MockTestMixin:
     @classmethod
     def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None):
         return Mock.objects.create(
-            title="foobar",
+            title="".join(random.choices(string.ascii_lowercase, k=6)),
             path=cls.create_bare_minimum_path(),
             verb=cls.create_bare_minimum_verb(),
             status_code=205,

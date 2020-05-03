@@ -1,63 +1,105 @@
 from unittest.mock import (
     Mock,
-    patch
 )
 
-from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser
+from django.urls import reverse
+from rest_framework.test import APIRequestFactory, APITestCase
 
 from common.tests.mixins import MockTestMixin
 from mocks.permissions import IsOwnOrganization
-from tenants.models import Organization
 
 
-class OrganizationPermissionTestCase(TestCase, MockTestMixin):
+class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
     @classmethod
-    def setUpClass(cls):
-        super(OrganizationPermissionTestCase, cls).setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.request_factory = APIRequestFactory()
         cls.permission_class = IsOwnOrganization()
+        cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.token = cls.tenant.user_ptr.auth_token
+        cls.url = reverse('v1:mock-list')
 
     def setUp(self):
-        self.request = Mock()
-        self.request.data = {
-            'organization': '99999999999999999'
-        }
-        self.request.user = Mock()
+        self.view = Mock()
+        self.view.action = "list"
 
     def test_anonymous_user_is_denied(self):
-        self.request.user.is_anonymous = True
+        request = self.request_factory.get(self.url)
+        request.user = AnonymousUser()
 
-        allowed = self.permission_class.has_permission(self.request, None)
+        allowed = self.permission_class.has_permission(request, self.view)
 
         self.assertFalse(allowed)
 
-    @patch('tenants.models.Organization.objects')
-    def test_non_existent_organization_is_denied(self, mock_org):
-        mock_org.get.side_effect = Organization.DoesNotExist
-        self.request.user.is_anonymous = False
+    def test_detail_request_is_allowed(self):
+        detail_url = reverse("v1:mock-detail", kwargs={'pk': 1})
+        request = self.request_factory.get(detail_url)
+        request.user = self.tenant.user_ptr
+        self.view.action = "retrieve"
 
-        result = self.permission_class.has_permission(self.request, None)
+        result = self.permission_class.has_permission(request, self.view)
 
-        self.assertFalse(result)
+        self.assertTrue(result)
 
-    @patch('tenants.models.Organization.objects')
-    def test_user_without_organization_is_denied(self, mock_org):
-        self.request.user.is_anonymous = False
-        organization = Organization.objects.create(
-            name='foobar'
-        )
-        mock_org.get.return_value = organization
+    def test_accessing_mock_in_different_organization_is_denied(self):
+        other_organization = self.create_bare_minimum_organization()
+        request = self.request_factory.get(self.url)
+        request.query_params = {'organization': other_organization.pk}
+        request.user = self.tenant.user_ptr
 
-        result = self.permission_class.has_permission(self.request, None)
+        result = self.permission_class.has_permission(request, self.view)
 
         self.assertFalse(result)
 
     def test_user_included_in_organization_is_allowed(self):
-        tenant = self.create_bare_minimum_tenant()
-        self.request.user = tenant
-        self.request.data['organization'] = tenant.organizations.first().id
-        mock_org = Mock(wraps=Organization.objects)
-        mock_org.get.return_value = tenant.organizations.first()
+        request = self.request_factory.get(self.url)
+        request.query_params = {'organization': self.organization.pk}
+        request.user = self.tenant.user_ptr
 
-        result = self.permission_class.has_permission(self.request, None)
+        result = self.permission_class.has_permission(request, self.view)
+
+        self.assertTrue(result)
+
+
+class OrganizationObjectPermissionTestCase(APITestCase, MockTestMixin):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.permission_class = IsOwnOrganization()
+        cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.request_factory = APIRequestFactory()
+        cls.mock = cls.create_bare_minimum_mock(cls.tenant)
+        cls.url = reverse('v1:mock-detail', kwargs={'pk': cls.mock.pk})
+
+    def setUp(self):
+        self.view = Mock()
+        self.view.action = 'retrieve'
+
+    def test_anonymous_user_is_denied(self):
+        request = self.request_factory.get(self.url)
+        request.user = AnonymousUser()
+
+        allowed = self.permission_class.has_object_permission(request, self.view, self.mock)
+
+        self.assertFalse(allowed)
+
+    def test_accessing_mock_in_different_organization_is_denied(self):
+        other_mock = self.create_bare_minimum_mock()
+        other_url = reverse('v1:mock-detail', kwargs={'pk': other_mock.pk})
+        request = self.request_factory.get(other_url)
+        request.user = self.tenant.user_ptr
+
+        result = self.permission_class.has_object_permission(request, self.view, other_mock)
+
+        self.assertFalse(result)
+
+    def test_user_included_in_organization_is_allowed(self):
+        request = self.request_factory.get(self.url)
+        request.user = self.tenant.user_ptr
+
+        result = self.permission_class.has_object_permission(request, self.view, self.mock)
 
         self.assertTrue(result)

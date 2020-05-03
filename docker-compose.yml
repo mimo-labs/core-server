@@ -2,43 +2,54 @@ version: '3.4'
 
 services:
   app:
-    build:
-      context: .
-      network: bridge
+    image: ldelelis/mockserver:develop
     restart: always
-    command: gunicorn -w4 -b 0.0.0.0:8000 mockserver.wsgi
+    command: gunicorn -w4 -b 0.0.0.0:8000 --chdir ./mockserver mockserver.wsgi
+    environment:
+      - DATABASE_URL=postgres://mockserver:changeme@db:5432/mocks-api
+      - DEBUG=False
     volumes:
       - .:/www
       - static_volume:/www/mockserver/static
-    environment:
-      - MOCK_SERVER_MONGODB_HOST=mongo
-    networks:
-      - app_network
     depends_on:
-      - mongo
+      - db
+
+  tasks:
+    image: ldelelis/mockserver:develop
+    restart: always
+    command: celery worker -A mockserver --workdir mockserver -l info
+    environment:
+      - CELERY_BROKER_URL=redis://cache:6379/1
+      - DEBUG=False
+    depends_on:
+      - cache
+
 
   nginx:
     image: nginx:latest
     restart: always
-    networks:
-      - app_network
     volumes:
       - ./conf:/etc/nginx/conf.d
       - static_volume:/www/mockserver/static
     ports:
-      - "12021:80"
+      - "8000:80"
     depends_on:
       - app
 
-  mongo:
-    image: mongo:latest
-    networks:
-      - app_network
+  db:
+    image: postgres:12
     restart: always
+    environment:
+      - POSTGRES_DB=mocks-api
+      - POSTGRES_USER=mockserver
+      - POSTGRES_PASSWORD=changeme
+    volumes:
+      - postgres:/var/lib/postgresql/data
 
-networks:
-  app_network:
-    driver: bridge
+  cache:
+    image: redis:6
+    restart: always
 
 volumes:
   static_volume:
+  postgres:
