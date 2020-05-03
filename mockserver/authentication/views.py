@@ -13,7 +13,7 @@ from django.http import (
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework import mixins, viewsets, status
+from rest_framework import mixins, viewsets, status, views
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_404_NOT_FOUND,
@@ -69,11 +69,8 @@ class Login(mixins.CreateModelMixin, viewsets.GenericViewSet):
             )
 
 
-class Logout(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = LoginSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def create(self, request, *args, **kwargs):
+class Logout(views.APIView):
+    def post(self, request):
         try:
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):

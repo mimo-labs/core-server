@@ -15,7 +15,7 @@ urlpatterns = [
     ),
     path(
         'logout',
-        Logout.as_view({'post': 'create'}),
+        Logout.as_view(),
         name='logout'
     ),
     path(
