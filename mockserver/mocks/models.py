@@ -66,7 +66,6 @@ class Params(OrganizationAwareModel):
 class Mock(OrganizationAwareModel):
     title = models.CharField(
         max_length=255,
-        primary_key=True
     )
     path = models.ForeignKey(
         'mocks.Endpoint',
