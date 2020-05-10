@@ -32,7 +32,11 @@ from tenants.serializers import (
 class TenantViewSet(viewsets.ModelViewSet):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
-    permission_classes = (IsAuthenticated, TenantPermission,)
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return (TenantPermission(),)
+        return (IsAuthenticated(), TenantPermission(),)
 
     @action(detail=False, methods=['GET', ])
     def me(self, request):
@@ -109,7 +113,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 
         return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['PUT'])
+    @action(detail=True, methods=['PUT', 'PATCH'])
     def profile(self, request, pk=None):
         organization: Organization = self.get_object()
 

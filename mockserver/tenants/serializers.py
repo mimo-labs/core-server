@@ -51,7 +51,7 @@ class OrganizationProfileSerializer(serializers.ModelSerializer):
 
 
 class TenantSerializer(serializers.ModelSerializer):
-    organizations = OrganizationThinSerializer(many=True)
+    organizations = OrganizationThinSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tenant

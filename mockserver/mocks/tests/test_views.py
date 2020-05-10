@@ -17,7 +17,7 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
         self.mock = self.create_bare_minimum_mock(self.tenant)
 
     def test_unauthenticated_detail_request_is_disallowed(self):
-        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.title})
+        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})
 
         response = self.c.get(url)
 
@@ -34,7 +34,7 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
         other_tenant = self.create_bare_minimum_tenant()
         token = other_tenant.user_ptr.auth_token
         self.c.credentials(HTTP_AUTHORIZATION=f'Token {token}')
-        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.title})
+        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})
 
         response = self.c.get(url)
 
@@ -42,7 +42,7 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
 
     def test_user_in_mock_organization_is_allowed(self):
         self.c.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
-        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.title})
+        url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})
 
         response = self.c.get(url)
 

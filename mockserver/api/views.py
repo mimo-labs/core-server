@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def fetch_mock(request):
     logger.info(f'fetch_mock organization {request.organization.uuid}')
 
-    query_params = {**request.GET.dict(), **request.POST.dict()}
+    query_params = {**request.GET.dict(), **request.POST.dict(), **request.data}
     mock_route = request.path.rstrip('/')
 
     mock = MockService.get_tenant_mocks(
