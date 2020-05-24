@@ -27,6 +27,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
         self.header_type = HeaderType.objects.create(
             name="Foo"
         )
+        self.host = self.mock.project.organization.uuid
 
     @patch('mocks.services.MockService.get_tenant_mocks')
     def test_list_mock_is_allowed(self, patch_get_mock):
@@ -36,7 +37,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         response: JsonResponse = self.c.get(
             f'{self.mock.path.path}/',
-            HTTP_HOST=f'{self.mock.organization.uuid}.localhost',
+            HTTP_HOST=f'{self.host}.localhost',
         )
 
         self.assertIsInstance(response.json(), list)
@@ -54,7 +55,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         response: JsonResponse = self.c.get(
             self.mock.path.path,
-            HTTP_HOST=f'{self.mock.organization.uuid}.localhost'
+            HTTP_HOST=f'{self.host}.localhost'
         )
 
         self.assertEqual(response.status_code, self.mock.status_code)
@@ -72,7 +73,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         response = self.c.get(
             '/does/not/exist',
-            HTTP_HOST=f'{self.mock.organization.uuid}.localhost'
+            HTTP_HOST=f'{self.host}.localhost'
         )
 
         self.assertEqual(response.status_code, 404)
@@ -84,7 +85,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
         response = self.c.get(
             '/some/mock',
-            HTTP_HOST=f'{self.mock.organization.uuid}.localhost'
+            HTTP_HOST=f'{self.host}.localhost'
         )
 
         self.assertEqual(response.status_code, 403)

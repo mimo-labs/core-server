@@ -1,14 +1,38 @@
+import logging
+
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
-from tenants.models import OrganizationAwareModel
 from common.validators import validate_path
+from common.models import DateAwareModel
 
 
-class Category(OrganizationAwareModel):
+logger = logging.getLogger(__name__)
+
+
+class Project(DateAwareModel):
     name = models.CharField(
         max_length=255
+    )
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Category(DateAwareModel):
+    name = models.CharField(
+        max_length=255
+    )
+    project = models.ForeignKey(
+        'mocks.Project',
+        null=True,
+        on_delete=models.CASCADE
     )
 
     class Meta:
@@ -18,43 +42,24 @@ class Category(OrganizationAwareModel):
         return self.name
 
 
-class Endpoint(OrganizationAwareModel):
+class Endpoint(DateAwareModel):
     path = models.CharField(
         max_length=2048,
         validators=(validate_path,),
         default='/'
-    )
-    category = models.ForeignKey(
-        'mocks.Category',
-        null=True,
-        on_delete=models.PROTECT
     )
 
     def __str__(self):
         return self.path
 
 
-class Content(OrganizationAwareModel):
-    mock = models.OneToOneField(
-        'mocks.Mock',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='content'
-    )
+class Content(DateAwareModel):
     content = JSONField(
         default=dict
     )
 
 
-class Params(OrganizationAwareModel):
-    mock = models.OneToOneField(
-        'mocks.Mock',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='params'
-    )
+class Params(DateAwareModel):
     content = JSONField(
         default=dict
     )
@@ -63,17 +68,40 @@ class Params(OrganizationAwareModel):
         verbose_name_plural = _('Params')
 
 
-class Mock(OrganizationAwareModel):
+class Mock(DateAwareModel):
     title = models.CharField(
         max_length=255,
-    )
-    path = models.ForeignKey(
-        'mocks.Endpoint',
-        on_delete=models.PROTECT
+        unique=True
     )
     verb = models.ForeignKey(
         'mocks.HttpVerb',
+        null=True,
         on_delete=models.PROTECT
+    )
+    category = models.ForeignKey(
+        'mocks.Category',
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    project = models.ForeignKey(
+        'mocks.Project',
+        null=True,
+        on_delete=models.PROTECT
+    )
+    path = models.OneToOneField(
+        'mocks.Endpoint',
+        null=True,
+        on_delete=models.PROTECT
+    )
+    params = models.OneToOneField(
+        'mocks.Params',
+        null=True,
+        on_delete=models.CASCADE
+    )
+    content = models.OneToOneField(
+        'mocks.Content',
+        null=True,
+        on_delete=models.CASCADE
     )
     status_code = models.IntegerField(
         default=200
@@ -83,6 +111,20 @@ class Mock(OrganizationAwareModel):
     )
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            if not self.content:
+                logger.info(f'create default content mock {self.pk} \
+                              tenant {self.project.organization.uuid}')
+                self.content = Content.objects.create(
+                    mock=self
+                )
+            if not self.params:
+                logger.info(f'create default params mock {self.pk} \
+                              tenant {self.project.organization.uuid}')
+                self.params = Params.objects.create(
+                    mock=self
+                )
+
         active_mocks = Mock.objects.filter(
             path=self.path,
             is_active=True
@@ -97,38 +139,29 @@ class Mock(OrganizationAwareModel):
         return self.title
 
 
-class HeaderType(OrganizationAwareModel):
+class HeaderType(DateAwareModel):
     name = models.CharField(
         max_length=255,
         primary_key=True
+    )
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
     )
 
     def __str__(self):
         return self.name
 
 
-class HttpVerb(OrganizationAwareModel):
-    name = models.CharField(
-        max_length=255,
-        primary_key=True
-    )
-
-    class Meta:
-        verbose_name = _('HTTP Verb')
-        verbose_name_plural = _('HTTP Verbs')
-
-    def __str__(self):
-        return self.name
-
-
-class Header(OrganizationAwareModel):
+class Header(DateAwareModel):
     header_type = models.ForeignKey(
         'mocks.HeaderType',
         on_delete=models.CASCADE
     )
     value = models.TextField()
     mock = models.ForeignKey(
-        'mocks.Mock',
+        "mocks.Mock",
         on_delete=models.CASCADE
     )
 
@@ -138,3 +171,22 @@ class Header(OrganizationAwareModel):
 
     def __str__(self):
         return "%s: %s" % (self.header_type, self.value)
+
+
+class HttpVerb(DateAwareModel):
+    name = models.CharField(
+        max_length=255,
+        primary_key=True
+    )
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    class Meta:
+        verbose_name = _('HTTP Verb')
+        verbose_name_plural = _('HTTP Verbs')
+
+    def __str__(self):
+        return self.name

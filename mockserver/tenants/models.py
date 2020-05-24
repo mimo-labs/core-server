@@ -7,17 +7,6 @@ from common.models import DateAwareModel
 from tenants.tasks import mail_membership_invite
 
 
-class OrganizationAwareModel(DateAwareModel):
-    organization = models.ForeignKey(
-        'tenants.Organization',
-        on_delete=models.CASCADE,
-        null=True
-    )
-
-    class Meta:
-        abstract = True
-
-
 class OrganizationMembership(DateAwareModel):
     tenant = models.ForeignKey(
         'tenants.Tenant',
@@ -105,7 +94,12 @@ class Tenant(DateAwareModel, User):
     pass
 
 
-class OrganizationInvite(OrganizationAwareModel):
+class OrganizationInvite(DateAwareModel):
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
     email = models.EmailField()
     tenant = models.ForeignKey(
         'tenants.Tenant',

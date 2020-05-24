@@ -6,7 +6,8 @@ import random
 from mocks.models import (
     Mock,
     Endpoint,
-    HttpVerb
+    HttpVerb,
+    Project
 )
 from tenants.models import (
     Organization,
@@ -40,6 +41,13 @@ class MockTestMixin:
         return tenant
 
     @classmethod
+    def create_bare_minimum_project(cls, organization: Optional[Organization] = None):
+        return Project.objects.create(
+            name="foobar",
+            organization=organization
+        )
+
+    @classmethod
     def create_bare_minimum_organization(cls, tenant: Optional[Tenant] = None):
         org = Organization.objects.create(
             name="foobar",
@@ -55,10 +63,11 @@ class MockTestMixin:
 
     @classmethod
     def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None):
+        organization = cls.create_bare_minimum_organization(tenant)
         return Mock.objects.create(
             title="".join(random.choices(string.ascii_lowercase, k=6)),
             path=cls.create_bare_minimum_path(),
             verb=cls.create_bare_minimum_verb(),
             status_code=205,
-            organization=cls.create_bare_minimum_organization(tenant),
+            project=cls.create_bare_minimum_project(organization),
         )

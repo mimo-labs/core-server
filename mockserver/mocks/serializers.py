@@ -19,7 +19,6 @@ class MockSerializer(serializers.ModelSerializer):
             'verb',
             'status_code',
             'is_active',
-            'organization',
         )
 
 
