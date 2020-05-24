@@ -21,7 +21,7 @@ class IsOwnOrganization(permissions.BasePermission):
         if request.user.is_anonymous:  # Requires login
             return False
 
-        return obj.organization_id in [
+        return obj.project.organization_id in [
             org.id for
             org in
             request.user.tenant.organizations.all()
