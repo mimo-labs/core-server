@@ -10,11 +10,17 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
     def setUpClass(cls):
         super().setUpClass()
         cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.project = cls.create_bare_minimum_project(cls.organization)
         cls.token = Token.objects.get(user=cls.tenant)
 
     def setUp(self):
         self.c = APIClient()
-        self.mock = self.create_bare_minimum_mock(self.tenant)
+        self.c.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
+        self.mock = self.create_bare_minimum_mock(self.tenant, self.project)
 
     def test_unauthenticated_detail_request_is_disallowed(self):
         url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})

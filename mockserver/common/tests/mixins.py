@@ -62,12 +62,15 @@ class MockTestMixin:
         return org
 
     @classmethod
-    def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None):
+    def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None, project: Optional[Project] =
+                                None):
         organization = cls.create_bare_minimum_organization(tenant)
+        if not project:
+            project = cls.create_bare_minimum_project(organization)
         return Mock.objects.create(
             title="".join(random.choices(string.ascii_lowercase, k=6)),
             path=cls.create_bare_minimum_path(),
             verb=cls.create_bare_minimum_verb(),
             status_code=205,
-            project=cls.create_bare_minimum_project(organization),
+            project=project,
         )

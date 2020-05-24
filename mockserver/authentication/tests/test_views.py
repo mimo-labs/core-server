@@ -22,9 +22,19 @@ from authentication.models import User, OneOffToken
 from common.tests.mixins import MockTestMixin
 
 
-class LoginViewTestCase(TestCase):
+class LoginViewTestCase(TestCase, MockTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.organization = cls.create_bare_minimum_organization()
+        cls.project = cls.create_bare_minimum_project(cls.organization)
+
     def setUp(self):
         self.client = Client()
+        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
         self.user_data = {
             "email": "foo@bar.baz",
             "password": "aaaaaa"
@@ -65,18 +75,28 @@ class LoginViewTestCase(TestCase):
         self.assertIn('id', json.loads(response.content))
 
 
-class LogoutViewTestCase(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user_data = {
+class LogoutViewTestCase(TestCase, MockTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user_data = {
             "email": "foo@bar.baz",
             "password": "aaaaaa"
         }
+        cls.organization = cls.create_bare_minimum_organization()
+        cls.project = cls.create_bare_minimum_project(cls.organization)
+
+    def setUp(self):
+        self.client = APIClient()
         self.user = User.objects.create(
             **self.user_data
         )
         self.token = self.user.auth_token
         self.url = reverse("logout")
+        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
 
     def test_successful_logout_destroys_token(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
@@ -101,6 +121,14 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
         cls.client = APIClient()
         cls.url = reverse('password_reset_request')
         cls.user = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.user)
+        cls.project = cls.create_bare_minimum_project(cls.organization)
+
+    def setUp(self):
+        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
 
     def test_junk_data_raises_error(self):
         request_data = {'email': 'aninvalidmail'}
@@ -159,6 +187,14 @@ class PasswordResetTestCase(APITestCase, MockTestMixin):
         super().setUpClass()
         cls.url = reverse('password_reset')
         cls.tenant = cls.create_bare_minimum_tenant()
+        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
+        cls.project = cls.create_bare_minimum_project(cls.organization)
+
+    def setUp(self):
+        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
 
     def test_regular_token_is_allowed(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')

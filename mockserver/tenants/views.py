@@ -78,7 +78,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                          responses={204: None})
     @action(detail=True, methods=['POST'], url_path='member-invite')
     def member_invite(self, request, pk=None):
-        from_domain = request.META['HTTP_HOST']
+        from_domain = request.META.get('HTTP_HOST')
         organization = self.get_object()
 
         for email in request.data['emails']:

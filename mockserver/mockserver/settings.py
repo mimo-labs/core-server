@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'tenants.middlewares.tenant.TenantMiddleware',
+    'mocks.middlewares.project.ProjectMiddleware',
 ]
 
 ROOT_URLCONF = 'mockserver.urls'
