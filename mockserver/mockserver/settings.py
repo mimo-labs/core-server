@@ -194,3 +194,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # CORS configuration
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# API Settings
+IS_ADMIN_API = os.getenv("IS_ADMIN_API", "false").lower() == "true"
