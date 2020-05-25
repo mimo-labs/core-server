@@ -14,6 +14,11 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
     def setUp(self):
         self.tenant = self.create_bare_minimum_tenant()
         self.organization = self.create_bare_minimum_organization()
+        self.project = self.create_bare_minimum_project(self.organization)
+        self.client.defaults['SERVER_NAME'] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.name
+        )
 
     def test_unauthenticated_requests_are_disallowed(self):
         with self.subTest('list should be disallowed'):
@@ -66,7 +71,7 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
         with self.subTest('member invite should be disallowed'):
             url = reverse('v1:organization-member-invite', kwargs={'pk': self.organization.pk})
-            response = self.client.post(url, **{'HTTP_HOST': 'foobar'})
+            response = self.client.post(url)
 
             self.assertEqual(response.status_code, 403)
 
@@ -162,7 +167,7 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         )
         url = reverse('v1:organization-member-invite', kwargs={'pk': self.organization.pk})
 
-        response = self.client.post(url, body, format='json', **{'HTTP_HOST': 'foobar'})
+        response = self.client.post(url, body, format='json')
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b'')
@@ -182,7 +187,7 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         )
         url = reverse('v1:organization-member-invite', kwargs={'pk': self.organization.pk})
 
-        response = self.client.post(url, body, format='json', **{'HTTP_HOST': 'foobar'})
+        response = self.client.post(url, body, format='json')
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b'')
