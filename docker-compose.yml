@@ -1,18 +1,41 @@
 version: '3.4'
 
 services:
-  app:
+  admin_app:
+    image: ldelelis/mockserver:develop
+    restart: always
+    command: gunicorn -w4 -b 0.0.0.0:8000 --chdir ./mockserver mockserver.wsgi
+    environment:
+      - IS_ADMIN_API=true
+      - DATABASE_URL=postgres://mockserver:changeme@db:5432/mocks-api
+      - DEBUG=True
+    volumes:
+      - .:/www
+      - static_volume:/usr/src/app/mockserver/static
+    depends_on:
+      - db
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.passHostHeaders: "true"
+      traefik.http.services.admin_app.loadbalancer.server.port: "8000"
+      traefik.http.routers.admin_app.rule: Host(`localhost`)
+
+  mocks_app:
     image: ldelelis/mockserver:develop
     restart: always
     command: gunicorn -w4 -b 0.0.0.0:8000 --chdir ./mockserver mockserver.wsgi
     environment:
       - DATABASE_URL=postgres://mockserver:changeme@db:5432/mocks-api
-      - DEBUG=False
+      - DEBUG=True
     volumes:
       - .:/www
-      - static_volume:/www/mockserver/static
     depends_on:
       - db
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.passHostHeaders: "true"
+      traefik.http.services.mocks_app.loadbalancer.server.port: "8000"
+      traefik.http.routers.mocks_app.rule: HostRegexp(`{org:[a-zA-Z0-9]+}.{proj:[a-zA-Z]+}.localhost`)
 
   tasks:
     image: ldelelis/mockserver:develop
@@ -24,6 +47,18 @@ services:
     depends_on:
       - cache
 
+  traefik:
+    image: traefik:v2.0
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    command:
+      - "--providers.docker"
+    depends_on:
+      - admin_app
+      - mocks_app
 
   nginx:
     image: nginx:latest
@@ -31,10 +66,12 @@ services:
     volumes:
       - ./conf:/etc/nginx/conf.d
       - static_volume:/www/mockserver/static
-    ports:
-      - "8000:80"
     depends_on:
-      - app
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.passHostHeaders: "true"
+      traefik.http.routers.nginx.rule: Host(`localhost`) && PathPrefix(`/static`)
 
   db:
     image: postgres:12
