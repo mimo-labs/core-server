@@ -7,7 +7,10 @@ from django.urls import reverse
 from rest_framework.test import APIRequestFactory, APITestCase
 
 from common.tests.mixins import MockTestMixin
-from mocks.permissions import IsOwnOrganization
+from mocks.permissions import (
+#     IsOwnOrganization,
+    IsOwnProjectOrganization,
+)
 
 
 class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
@@ -15,7 +18,7 @@ class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.request_factory = APIRequestFactory()
-        cls.permission_class = IsOwnOrganization()
+        cls.permission_class = IsOwnProjectOrganization()
         cls.tenant = cls.create_bare_minimum_tenant()
         cls.organization = cls.create_bare_minimum_organization(cls.tenant)
         cls.token = cls.tenant.user_ptr.auth_token
@@ -46,7 +49,7 @@ class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
     def test_accessing_mock_in_different_organization_is_denied(self):
         other_organization = self.create_bare_minimum_organization()
         request = self.request_factory.get(self.url)
-        request.query_params = {'organization': other_organization.pk}
+        request.data = {'organization': other_organization.pk}
         request.user = self.tenant.user_ptr
 
         result = self.permission_class.has_permission(request, self.view)
@@ -55,7 +58,7 @@ class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
 
     def test_user_included_in_organization_is_allowed(self):
         request = self.request_factory.get(self.url)
-        request.query_params = {'organization': self.organization.pk}
+        request.data = {'organization': self.organization.pk}
         request.user = self.tenant.user_ptr
 
         result = self.permission_class.has_permission(request, self.view)
@@ -67,7 +70,7 @@ class OrganizationObjectPermissionTestCase(APITestCase, MockTestMixin):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.permission_class = IsOwnOrganization()
+        cls.permission_class = IsOwnProjectOrganization()
         cls.tenant = cls.create_bare_minimum_tenant()
         cls.organization = cls.create_bare_minimum_organization(cls.tenant)
         cls.request_factory = APIRequestFactory()

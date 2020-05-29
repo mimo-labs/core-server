@@ -6,8 +6,18 @@ from mocks.models import (
     HttpVerb,
     Category,
     Endpoint,
-    Header
+    Header,
+    Project,
 )
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = (
+            'name',
+            'organization',
+        )
 
 
 class MockSerializer(serializers.ModelSerializer):

@@ -27,6 +27,7 @@ class OrganizationMembershipAdmin(admin.StackedInline):
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
+    fields = ('name', 'is_playground',)
     list_display = ('name', 'uuid',)
 
 

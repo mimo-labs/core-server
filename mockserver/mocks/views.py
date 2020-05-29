@@ -7,23 +7,34 @@ from mocks.models import (
     HttpVerb,
     Category,
     Endpoint,
-    Header
+    Header,
+    Project,
 )
-from mocks.permissions import IsOwnOrganization
+from mocks.permissions import (
+    IsOwnOrganization,
+    IsOwnProjectOrganization,
+)
 from mocks.serializers import (
     MockSerializer,
     HeaderTypeSerializer,
     HttpVerbSerializer,
     CategorySerializer,
     EndpointSerializer,
-    HeaderSerializer
+    HeaderSerializer,
+    ProjectSerializer,
 )
+
+
+class ProjectViewset(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsOwnOrganization,)
 
 
 class MockViewset(viewsets.ModelViewSet):
     queryset = Mock.objects.all()
     serializer_class = MockSerializer
-    permission_classes = (IsOwnOrganization,)
+    permission_classes = (IsOwnProjectOrganization,)
     filter_class = MockFilterSet
 
 
@@ -36,7 +47,7 @@ class HeaderTypeViewset(viewsets.ModelViewSet):
 class HeaderViewset(viewsets.ModelViewSet):
     queryset = Header.objects.all()
     serializer_class = HeaderSerializer
-    permission_classes = (IsOwnOrganization,)
+    permission_classes = (IsOwnProjectOrganization,)
 
 
 class HttpVerbViewset(viewsets.ModelViewSet):
@@ -48,10 +59,10 @@ class HttpVerbViewset(viewsets.ModelViewSet):
 class CategoryViewset(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsOwnOrganization,)
+    permission_classes = (IsOwnProjectOrganization,)
 
 
 class EndpointViewset(viewsets.ModelViewSet):
     queryset = Endpoint.objects.all()
     serializer_class = EndpointSerializer
-    permission_classes = (IsOwnOrganization,)
+    permission_classes = (IsOwnProjectOrganization,)
