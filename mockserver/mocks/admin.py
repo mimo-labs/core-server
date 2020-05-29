@@ -5,6 +5,7 @@ from mocks.models import (
     HttpVerb,
     Endpoint,
     Category,
+    Project,
 )
 
 
@@ -36,6 +37,7 @@ from mocks.models import (
 admin.site.register(HttpVerb)
 admin.site.register(Endpoint)
 admin.site.register(Category)
+admin.site.register(Project)
 
 
 admin.site.register(HeaderType)

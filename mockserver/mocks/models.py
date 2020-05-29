@@ -48,6 +48,11 @@ class Endpoint(DateAwareModel):
         validators=(validate_path,),
         default='/'
     )
+    project = models.ForeignKey(
+        'mocks.Project',
+        null=True,
+        on_delete=models.PROTECT
+    )
 
     def __str__(self):
         return self.path
@@ -168,6 +173,10 @@ class Header(DateAwareModel):
     @property
     def as_response_header(self):
         return self.header_type.name, self.value
+
+    @property
+    def project(self):
+        return self.mock.project
 
     def __str__(self):
         return "%s: %s" % (self.header_type, self.value)
