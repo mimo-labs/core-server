@@ -3,7 +3,6 @@ from rest_framework.routers import SimpleRouter
 from mocks.views import (
     MockViewset,
     HeaderTypeViewset,
-    HeaderViewset,
     HttpVerbViewset,
     EndpointViewset,
     CategoryViewset,
@@ -22,7 +21,6 @@ router.register('tenants', TenantViewSet)
 router.register('organizations', OrganizationViewSet)
 router.register('mocks', MockViewset)
 router.register('header-types', HeaderTypeViewset)
-router.register('headers', HeaderViewset)
 router.register('http-verbs', HttpVerbViewset)
 router.register('categories', CategoryViewset)
 router.register('endpoints', EndpointViewset)

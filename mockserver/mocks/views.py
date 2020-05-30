@@ -7,7 +7,6 @@ from mocks.models import (
     HttpVerb,
     Category,
     Endpoint,
-    Header,
     Project,
 )
 from mocks.permissions import (
@@ -20,7 +19,6 @@ from mocks.serializers import (
     HttpVerbSerializer,
     CategorySerializer,
     EndpointSerializer,
-    HeaderSerializer,
     ProjectSerializer,
 )
 
@@ -42,12 +40,6 @@ class HeaderTypeViewset(viewsets.ModelViewSet):
     queryset = HeaderType.objects.all()
     serializer_class = HeaderTypeSerializer
     permission_classes = (IsOwnOrganization,)
-
-
-class HeaderViewset(viewsets.ModelViewSet):
-    queryset = Header.objects.all()
-    serializer_class = HeaderSerializer
-    permission_classes = (IsOwnProjectOrganization,)
 
 
 class HttpVerbViewset(viewsets.ModelViewSet):

@@ -48,11 +48,16 @@ class Endpoint(DateAwareModel):
         validators=(validate_path,),
         default='/'
     )
-    project = models.ForeignKey(
-        'mocks.Project',
+    category = models.ForeignKey(
+        'mocks.Category',
         null=True,
+        blank=True,
         on_delete=models.PROTECT
     )
+
+    @property
+    def project(self):
+        return self.category.project
 
     def __str__(self):
         return self.path
@@ -60,13 +65,29 @@ class Endpoint(DateAwareModel):
 
 class Content(DateAwareModel):
     content = JSONField(
+        blank=True,
         default=dict
+    )
+    mock = models.ForeignKey(
+        'mocks.Mock',
+        null=True,
+        unique=True,
+        related_name='content',
+        on_delete=models.CASCADE
     )
 
 
 class Params(DateAwareModel):
     content = JSONField(
+        blank=True,
         default=dict
+    )
+    mock = models.ForeignKey(
+        'mocks.Mock',
+        null=True,
+        unique=True,
+        related_name='params',
+        on_delete=models.CASCADE
     )
 
     class Meta:
@@ -83,30 +104,10 @@ class Mock(DateAwareModel):
         null=True,
         on_delete=models.PROTECT
     )
-    category = models.ForeignKey(
-        'mocks.Category',
-        null=True,
-        on_delete=models.SET_NULL
-    )
-    project = models.ForeignKey(
-        'mocks.Project',
-        null=True,
-        on_delete=models.PROTECT
-    )
-    path = models.OneToOneField(
+    path = models.ForeignKey(
         'mocks.Endpoint',
         null=True,
         on_delete=models.PROTECT
-    )
-    params = models.OneToOneField(
-        'mocks.Params',
-        null=True,
-        on_delete=models.CASCADE
-    )
-    content = models.OneToOneField(
-        'mocks.Content',
-        null=True,
-        on_delete=models.CASCADE
     )
     status_code = models.IntegerField(
         default=200
@@ -115,18 +116,24 @@ class Mock(DateAwareModel):
         default=True
     )
 
+    @property
+    def project(self):
+        return self.path.project
+
     def save(self, *args, **kwargs):
-        if not self.pk:
-            if not self.content:
-                logger.info(f'create default content mock {self.pk} \
-                              tenant {self.project.organization.uuid}')
-                self.content = Content.objects.create(
+        is_new = not self.pk
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            if not self.content.exists():
+                logger.info(f'create default content for mock {self.pk}')
+                Content.objects.create(
                     mock=self
                 )
-            if not self.params:
-                logger.info(f'create default params mock {self.pk} \
-                              tenant {self.project.organization.uuid}')
-                self.params = Params.objects.create(
+            if not self.params.exists():
+                logger.info(f'create default params for mock {self.pk}')
+                Params.objects.create(
                     mock=self
                 )
 
@@ -137,8 +144,6 @@ class Mock(DateAwareModel):
 
         if active_mocks.exists():
             active_mocks.update(is_active=False)
-
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -167,6 +172,7 @@ class Header(DateAwareModel):
     value = models.TextField()
     mock = models.ForeignKey(
         "mocks.Mock",
+        related_name="headers",
         on_delete=models.CASCADE
     )
 

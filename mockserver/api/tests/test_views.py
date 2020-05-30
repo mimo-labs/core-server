@@ -31,8 +31,9 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
 
     @patch('mocks.services.MockService.get_tenant_mocks')
     def test_list_mock_is_allowed(self, patch_get_mock):
-        self.mock.content.content = ['foo', 'bar', 'baz']
-        self.mock.content.save()
+        mock_content = self.mock.content.get()
+        mock_content.content = ['foo', 'bar', 'baz']
+        mock_content.save()
         patch_get_mock.return_value = self.mock
 
         response: JsonResponse = self.c.get(
@@ -41,7 +42,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
         )
 
         self.assertIsInstance(response.json(), list)
-        self.assertEqual(response.json(), self.mock.content.content)
+        self.assertEqual(response.json(), mock_content.content)
         self.assertEqual(len(response.json()), 3)
 
     @patch('mocks.services.MockService.get_tenant_mocks')
