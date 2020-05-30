@@ -9,7 +9,7 @@ class IsOwnOrganization(permissions.BasePermission):
         if view.action != 'list':
             return True
 
-        organization_id = int(request.data.get('organization'))
+        organization_id = int(request.query_params.get('organization'))
 
         return organization_id in [
             org.id for
@@ -36,7 +36,7 @@ class IsOwnProjectOrganization(permissions.BasePermission):
         if view.action != 'list':
             return True
 
-        organization_id = int(request.data.get('organization'))
+        organization_id = int(request.query_params.get('organization'))
 
         return organization_id in [
             org.id for

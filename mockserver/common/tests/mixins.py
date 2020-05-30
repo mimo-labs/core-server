@@ -7,7 +7,8 @@ from mocks.models import (
     Mock,
     Endpoint,
     HttpVerb,
-    Project
+    Project,
+    Category,
 )
 from tenants.models import (
     Organization,
@@ -18,9 +19,19 @@ from tenants.models import (
 
 class MockTestMixin:
     @classmethod
-    def create_bare_minimum_path(cls):
+    def create_bare_minimum_category(cls, project: Project):
+        return Category.objects.create(
+            project=project,
+            name=''.join(random.choices(string.ascii_lowercase, k=6))
+        )
+
+    @classmethod
+    def create_bare_minimum_endpoint(cls, project: Optional[Project] = None):
+        if not project:
+            project = cls.create_bare_minimum_project()
         return Endpoint.objects.create(
-            path="/foo/bar"
+            path="/foo/bar",
+            category=cls.create_bare_minimum_category(project)
         )
 
     @classmethod
@@ -69,8 +80,7 @@ class MockTestMixin:
             project = cls.create_bare_minimum_project(organization)
         return Mock.objects.create(
             title="".join(random.choices(string.ascii_lowercase, k=6)),
-            path=cls.create_bare_minimum_path(),
+            path=cls.create_bare_minimum_endpoint(project),
             verb=cls.create_bare_minimum_verb(),
             status_code=205,
-            project=project,
         )

@@ -8,7 +8,6 @@ from rest_framework.test import APIRequestFactory, APITestCase
 
 from common.tests.mixins import MockTestMixin
 from mocks.permissions import (
-#     IsOwnOrganization,
     IsOwnProjectOrganization,
 )
 
@@ -49,7 +48,7 @@ class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
     def test_accessing_mock_in_different_organization_is_denied(self):
         other_organization = self.create_bare_minimum_organization()
         request = self.request_factory.get(self.url)
-        request.data = {'organization': other_organization.pk}
+        request.query_params = {'organization': other_organization.pk}
         request.user = self.tenant.user_ptr
 
         result = self.permission_class.has_permission(request, self.view)
@@ -58,7 +57,7 @@ class OrganizationPermissionTestCase(APITestCase, MockTestMixin):
 
     def test_user_included_in_organization_is_allowed(self):
         request = self.request_factory.get(self.url)
-        request.data = {'organization': self.organization.pk}
+        request.query_params = {'organization': self.organization.pk}
         request.user = self.tenant.user_ptr
 
         result = self.permission_class.has_permission(request, self.view)

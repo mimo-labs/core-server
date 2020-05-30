@@ -41,12 +41,14 @@ def fetch_mock(request):
             status=HTTP_404_NOT_FOUND
         )
 
+    content = mock.content.get()
+
     response = JsonResponse(
-        mock.content.content,
+        content.content,
         status=mock.status_code,
         safe=False
     )
-    for header in mock.header_set.all():
+    for header in mock.headers.all():
         header_type, value = header.as_response_header
         response[header_type] = value
 
