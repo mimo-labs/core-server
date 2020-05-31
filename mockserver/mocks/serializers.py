@@ -34,7 +34,6 @@ class HeaderSerializer(serializers.ModelSerializer):
         fields = (
             'header_type',
             'value',
-            'mock',
         )
         extra_kwargs: {
             'mock': {
