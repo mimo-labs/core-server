@@ -4,6 +4,7 @@ from tenants.models import (
     Organization,
     Tenant,
     OrganizationMembership,
+    Project,
 )
 
 
@@ -36,3 +37,6 @@ class TenantAdmin(PasswordHasherMixin, admin.ModelAdmin):
     inlines = (
         OrganizationMembershipAdmin,
     )
+
+
+admin.site.register(Project)

@@ -7,8 +7,23 @@ from tenants.models import (
     Organization,
     OrganizationMembership,
     OrganizationInvite,
-    OrganizationProfile
+    OrganizationProfile,
+    Project,
 )
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    organization = serializers.PrimaryKeyRelatedField(
+        queryset=Organization.objects.all(),
+        allow_null=False
+    )
+
+    class Meta:
+        model = Project
+        fields = (
+            'name',
+            'organization',
+        )
 
 
 class OrganizationProfileThinSerializer(serializers.ModelSerializer):

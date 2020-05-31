@@ -6,11 +6,11 @@ from mocks.views import (
     HttpVerbViewset,
     EndpointViewset,
     CategoryViewset,
-    ProjectViewset,
 )
 from tenants.views import (
     TenantViewSet,
-    OrganizationViewSet
+    OrganizationViewSet,
+    ProjectViewset,
 )
 
 app_name = 'api'

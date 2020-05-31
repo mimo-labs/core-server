@@ -7,7 +7,6 @@ from mocks.models import (
     HttpVerb,
     Endpoint,
     Category,
-    Project,
     Header,
     Params,
     Content,
@@ -101,7 +100,7 @@ class MockAdmin(admin.ModelAdmin):
 admin.site.register(HttpVerb)
 admin.site.register(Endpoint)
 admin.site.register(Category)
-admin.site.register(Project)
+# admin.site.register(Project)
 
 
 admin.site.register(HeaderType)

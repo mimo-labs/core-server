@@ -10,13 +10,15 @@ from rest_framework.permissions import IsAuthenticated
 
 from tenants.models import (
     Tenant,
-    Organization
+    Organization,
+    Project,
 )
 from tenants.permissions import (
     TenantPermission,
     IsOrganizationMemberPermission,
     IsOrganizationOwnerPermission,
-    IsOrganizationAdminOrOwnerPermission
+    IsOrganizationAdminOrOwnerPermission,
+    IsOwnOrganization,
 )
 from tenants.schema import OrganizationInviteSchema
 from tenants.serializers import (
@@ -25,8 +27,15 @@ from tenants.serializers import (
     OrganizationSerializer,
     OrganizationInviteSerializer,
     OrganizationProfileSerializer,
-    OrganizationPromotionSerializer
+    OrganizationPromotionSerializer,
+    ProjectSerializer,
 )
+
+
+class ProjectViewset(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsOwnOrganization,)
 
 
 class TenantViewSet(viewsets.ModelViewSet):
