@@ -36,7 +36,6 @@ class Endpoint(DateAwareModel):
     )
     categories = models.ManyToManyField(
         'mocks.Category',
-        null=True,
         blank=True,
         related_name="endpoints",
     )

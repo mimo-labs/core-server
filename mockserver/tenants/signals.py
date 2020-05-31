@@ -6,6 +6,7 @@ from tenants.models import (
     Organization,
     OrganizationMembership
 )
+from tenants.services import OrganizationService
 
 
 @receiver(post_save, sender=Tenant)
@@ -21,3 +22,9 @@ def create_playground_organization(sender, instance=None, created=False, **kwarg
             is_owner=True,
             is_admin=True
         )
+
+
+@receiver(post_save, sender=Organization)
+def bootstrap_organization(sender, instance=None, created=False, **kwargs):
+    if created:
+        OrganizationService.bootstrap_organization(organization=instance)
