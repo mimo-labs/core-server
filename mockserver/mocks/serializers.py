@@ -159,6 +159,7 @@ class EndpointSerializer(serializers.ModelSerializer):
     class Meta:
         model = Endpoint
         fields = (
+            'id',
             'path',
             'category',
         )
