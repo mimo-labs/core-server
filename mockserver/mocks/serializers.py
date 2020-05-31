@@ -34,7 +34,6 @@ class HeaderSerializer(serializers.ModelSerializer):
         fields = (
             'header_type',
             'value',
-            'mock',
         )
         extra_kwargs: {
             'mock': {
@@ -159,6 +158,7 @@ class EndpointSerializer(serializers.ModelSerializer):
     class Meta:
         model = Endpoint
         fields = (
+            'id',
             'path',
             'category',
         )
