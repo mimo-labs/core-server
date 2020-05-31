@@ -29,10 +29,12 @@ class MockTestMixin:
     def create_bare_minimum_endpoint(cls, project: Optional[Project] = None):
         if not project:
             project = cls.create_bare_minimum_project()
-        return Endpoint.objects.create(
+        endpoint = Endpoint.objects.create(
             path="/foo/bar",
-            category=cls.create_bare_minimum_category(project)
         )
+        endpoint.categories.add(cls.create_bare_minimum_category(project))
+
+        return endpoint
 
     @classmethod
     def create_bare_minimum_verb(cls):

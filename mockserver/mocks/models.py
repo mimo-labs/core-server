@@ -48,16 +48,16 @@ class Endpoint(DateAwareModel):
         validators=(validate_path,),
         default='/'
     )
-    category = models.ForeignKey(
+    categories = models.ManyToManyField(
         'mocks.Category',
         null=True,
         blank=True,
-        on_delete=models.PROTECT
+        related_name="endpoints",
     )
 
     @property
     def project(self):
-        return self.category.project
+        return self.categories.first().project
 
     def __str__(self):
         return self.path
