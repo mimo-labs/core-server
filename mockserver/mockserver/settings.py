@@ -55,8 +55,6 @@ INSTALLED_APPS = [
     'tenants',
 ]
 
-APPEND_SLASH = False
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -199,3 +197,5 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # API Settings
 IS_ADMIN_API = os.getenv("IS_ADMIN_API", "false").lower() == "true"
+
+APPEND_SLASH = IS_ADMIN_API
