@@ -11,26 +11,12 @@ from common.models import DateAwareModel
 logger = logging.getLogger(__name__)
 
 
-class Project(DateAwareModel):
-    name = models.CharField(
-        max_length=255
-    )
-    organization = models.ForeignKey(
-        'tenants.Organization',
-        on_delete=models.CASCADE,
-        null=True
-    )
-
-    def __str__(self):
-        return self.name
-
-
 class Category(DateAwareModel):
     name = models.CharField(
         max_length=255
     )
     project = models.ForeignKey(
-        'mocks.Project',
+        'tenants.Project',
         null=True,
         on_delete=models.CASCADE
     )

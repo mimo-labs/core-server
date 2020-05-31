@@ -7,25 +7,13 @@ from mocks.models import (
     Category,
     Endpoint,
     Header,
-    Project,
     Content,
     Params,
 )
-from tenants.models import Organization
-
-
-class ProjectSerializer(serializers.ModelSerializer):
-    organization = serializers.PrimaryKeyRelatedField(
-        queryset=Organization.objects.all(),
-        allow_null=False
-    )
-
-    class Meta:
-        model = Project
-        fields = (
-            'name',
-            'organization',
-        )
+from tenants.models import (
+    Organization,
+    Project,
+)
 
 
 class HeaderSerializer(serializers.ModelSerializer):

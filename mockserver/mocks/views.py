@@ -7,11 +7,6 @@ from mocks.models import (
     HttpVerb,
     Category,
     Endpoint,
-    Project,
-)
-from mocks.permissions import (
-    IsOwnOrganization,
-    IsOwnProjectOrganization,
 )
 from mocks.serializers import (
     MockSerializer,
@@ -19,14 +14,11 @@ from mocks.serializers import (
     HttpVerbSerializer,
     CategorySerializer,
     EndpointSerializer,
-    ProjectSerializer,
 )
-
-
-class ProjectViewset(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = (IsOwnOrganization,)
+from tenants.permissions import (
+    IsOwnOrganization,
+    IsOwnProjectOrganization,
+)
 
 
 class MockViewset(viewsets.ModelViewSet):

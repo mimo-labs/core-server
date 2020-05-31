@@ -7,6 +7,20 @@ from common.models import DateAwareModel
 from tenants.tasks import mail_membership_invite
 
 
+class Project(DateAwareModel):
+    name = models.CharField(
+        max_length=255
+    )
+    organization = models.ForeignKey(
+        'tenants.Organization',
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class OrganizationMembership(DateAwareModel):
     tenant = models.ForeignKey(
         'tenants.Tenant',

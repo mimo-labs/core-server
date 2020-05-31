@@ -1,10 +1,7 @@
 from django.core.exceptions import ValidationError
-
-from mocks.models import (
-    Project
-)
 from tenants.models import (
-    Organization
+    Organization,
+    Project,
 )
 
 

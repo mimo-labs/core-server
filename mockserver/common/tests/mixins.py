@@ -7,13 +7,13 @@ from mocks.models import (
     Mock,
     Endpoint,
     HttpVerb,
-    Project,
     Category,
 )
 from tenants.models import (
     Organization,
     Tenant,
-    OrganizationMembership
+    OrganizationMembership,
+    Project,
 )
 
 
