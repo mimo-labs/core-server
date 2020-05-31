@@ -153,12 +153,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class EndpointSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), allow_null=False)
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        allow_null=False,
+        many=True,
+    )
 
     class Meta:
         model = Endpoint
         fields = (
             'id',
             'path',
-            'category',
+            'categories',
         )
