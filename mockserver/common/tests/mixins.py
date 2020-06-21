@@ -6,8 +6,8 @@ import random
 from mocks.models import (
     Mock,
     Endpoint,
-    HttpVerb,
     Category,
+    HttpVerb,
 )
 from tenants.models import (
     Organization,
@@ -37,9 +37,10 @@ class MockTestMixin:
         return endpoint
 
     @classmethod
-    def create_bare_minimum_verb(cls):
+    def create_bare_minimum_verb(cls, organization: Organization):
         verb, _ = HttpVerb.objects.get_or_create(
-            name="GET"
+            name="GET",
+            organization=organization
         )
         return verb
 
@@ -83,6 +84,6 @@ class MockTestMixin:
         return Mock.objects.create(
             title="".join(random.choices(string.ascii_lowercase, k=6)),
             path=cls.create_bare_minimum_endpoint(project),
-            verb=cls.create_bare_minimum_verb(),
+            verb=cls.create_bare_minimum_verb(organization),
             status_code=205,
         )

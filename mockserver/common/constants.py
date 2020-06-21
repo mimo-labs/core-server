@@ -1,0 +1,1 @@
+STANDARD_VERBS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
