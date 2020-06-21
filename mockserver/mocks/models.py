@@ -177,7 +177,6 @@ class Header(DateAwareModel):
 class HttpVerb(DateAwareModel):
     name = models.CharField(
         max_length=255,
-        primary_key=True
     )
     organization = models.ForeignKey(
         'tenants.Organization',
