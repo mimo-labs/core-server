@@ -5,6 +5,7 @@ from django.db import models
 from authentication.models import User
 from common.models import DateAwareModel
 from tenants.tasks import mail_membership_invite
+from mocks.models import Category
 
 
 class Project(DateAwareModel):
@@ -16,6 +17,15 @@ class Project(DateAwareModel):
         on_delete=models.CASCADE,
         null=True
     )
+
+    def save(self, *args, **kwargs):
+        project = super().save(*args, **kwargs)
+        Category.objects.create(
+            name="Uncategorized",
+            project=self,
+        )
+
+        return project
 
     def __str__(self):
         return self.name
