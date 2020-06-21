@@ -28,6 +28,7 @@ from tenants.serializers import (
     OrganizationInviteSerializer,
     OrganizationProfileSerializer,
     OrganizationPromotionSerializer,
+    OrganizationDemotionSerializer,
     ProjectSerializer,
 )
 
@@ -63,7 +64,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         elif self.action == 'retrieve':
             return [IsAuthenticated(), IsOrganizationMemberPermission()]
-        elif self.action in ('destroy', 'member_promotion'):
+        elif self.action in ('destroy', 'member_promotion', 'member_demotion'):
             return [IsAuthenticated(), IsOrganizationOwnerPermission()]
         else:
             return [
@@ -78,6 +79,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             return OrganizationInviteSerializer
         elif self.action == "member_promotion":
             return OrganizationPromotionSerializer
+        elif self.action == "member_demotion":
+            return OrganizationDemotionSerializer
         elif self.action == "profile":
             return OrganizationProfileSerializer
         return OrganizationSerializer
@@ -110,6 +113,20 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST'], url_path='member-promotion')
     def member_promotion(self, request, pk=None):
+        org = self.get_object()
+        data = {
+            **request.data,
+            'organization': org.pk
+        }
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['POST'], url_path='member-demotion')
+    def member_demotion(self, request, pk=None):
         org = self.get_object()
         data = {
             **request.data,
