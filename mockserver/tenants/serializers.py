@@ -42,6 +42,7 @@ class OrganizationThinSerializer(serializers.ModelSerializer):
         depth = 1
         model = Organization
         fields = (
+            'id',
             'uuid',
             'profile',
         )
