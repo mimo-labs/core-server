@@ -2,7 +2,10 @@ import logging
 
 from common import constants
 from common.services import Service
-from tenants.models import Organization
+from tenants.models import (
+    Organization,
+    Project,
+)
 from mocks.models import (
     HttpVerb,
     HeaderType,
@@ -28,3 +31,8 @@ class OrganizationService(Service):
                 name=header_type,
                 organization=organization
             )
+
+        Project.objects.create(
+            name="Dummy project",
+            organization=organization,
+        )
