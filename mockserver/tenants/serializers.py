@@ -159,3 +159,33 @@ class OrganizationPromotionSerializer(serializers.Serializer):
         membership.save()
 
         return membership
+
+
+class OrganizationDemotionSerializer(serializers.Serializer):
+    tenant = serializers.PrimaryKeyRelatedField(queryset=Tenant.objects.all())
+    organization = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all())
+
+    class Meta:
+        fields = (
+            'tenant',
+            'organization',
+        )
+
+    def validate(self, attrs):
+        if not OrganizationMembership.objects.filter(
+            tenant=attrs['tenant'],
+            organization=attrs['organization']
+        ).exists():
+            raise serializers.ValidationError('tenant is not part of the organization')
+
+        return attrs
+
+    def create(self, validated_data):
+        membership = OrganizationMembership.objects.get(
+            tenant=validated_data['tenant'],
+            organization=validated_data['organization']
+        )
+        membership.is_admin = False
+        membership.save()
+
+        return membership
