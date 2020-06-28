@@ -6,7 +6,8 @@ from common.tests.mixins import MockTestMixin
 from tenants.serializers import (
     TenantSerializer,
     OrganizationSerializer,
-    OrganizationPromotionSerializer
+    OrganizationPromotionSerializer,
+    OrganizationDemotionSerializer,
 )
 
 
@@ -82,3 +83,36 @@ class OrganizationPromotionSerializerTestCase(MockTestMixin, TestCase):
         result = ser.save()
 
         self.assertTrue(result.is_admin)
+
+
+class OrganizationDemotionSerializerTestCase(MockTestMixin, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(OrganizationDemotionSerializerTestCase, cls).setUpClass()
+        cls.serializer = OrganizationDemotionSerializer
+        cls.organization = cls.create_bare_minimum_organization()
+        cls.tenant = cls.create_bare_minimum_tenant()
+
+    def test_demoting_non_existent_member_fails(self):
+        data = {
+            'organization': self.organization.pk,
+            'tenant': self.tenant.pk
+        }
+        ser = self.serializer(data=data)
+
+        with self.assertRaises(ValidationError, msg='tenant is not part of the organization'):
+            ser.is_valid(raise_exception=True)
+
+    def test_serializer_creation_sets_member_as_admin(self):
+        other_tenant = self.create_bare_minimum_tenant()
+        other_org = self.create_bare_minimum_organization(other_tenant)
+        data = {
+            'organization': other_org.pk,
+            'tenant': other_tenant.pk
+        }
+        ser = self.serializer(data=data)
+        ser.is_valid()
+
+        result = ser.save()
+
+        self.assertFalse(result.is_admin)

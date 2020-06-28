@@ -47,7 +47,13 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
         with self.subTest('promotion should be disallowed'):
             url = reverse('v1:organization-member-promotion', kwargs={'pk': self.organization.pk})
-            response = self.client.put(url)
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 401)
+
+        with self.subTest('demotion should be disallowed'):
+            url = reverse('v1:organization-member-demotion', kwargs={'pk': self.organization.pk})
+            response = self.client.post(url)
 
             self.assertEqual(response.status_code, 401)
 
@@ -83,6 +89,12 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
         with self.subTest('member promotion should be disallowed'):
             url = reverse('v1:organization-member-promotion', kwargs={'pk': self.organization.pk})
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 403)
+
+        with self.subTest('member demotion should be disallowed'):
+            url = reverse('v1:organization-member-demotion', kwargs={'pk': self.organization.pk})
             response = self.client.post(url)
 
             self.assertEqual(response.status_code, 403)
@@ -143,6 +155,20 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
     @patch('tenants.views.OrganizationViewSet.get_serializer', new=Mock())
     def test_authenticated_owner_promotion_is_allowed(self):
         url = reverse('v1:organization-member-promotion', kwargs={'pk': self.organization.pk})
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+        self.organization.organizationmembership_set.create(
+            organization=self.organization,
+            tenant=self.tenant,
+            is_owner=True
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 204)
+
+    @patch('tenants.views.OrganizationViewSet.get_serializer', new=Mock())
+    def test_authenticated_owner_demotion_is_allowed(self):
+        url = reverse('v1:organization-member-demotion', kwargs={'pk': self.organization.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
         self.organization.organizationmembership_set.create(
             organization=self.organization,
