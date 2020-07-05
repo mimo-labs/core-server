@@ -154,3 +154,19 @@ class EndpointSerializer(serializers.ModelSerializer):
             'path',
             'categories',
         )
+
+    def validate(self, data):
+        # Endpoint Unicity:
+        # Since all categories correspond to the same project
+        # We can grab whichever. The first one is picked since it's guaranteed to exist
+        project = data['categories'][0].project
+        project_categories = project.category_set.all()
+
+        for category in project_categories:
+            category_endpoints = category.endpoints.all()
+            if any(ep for ep in category_endpoints if ep.path == data['path']):
+                raise serializers.ValidationError(
+                    "An endpoint with the path %s already exists for the project." % data['path']
+                )
+
+        return data

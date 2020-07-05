@@ -19,25 +19,29 @@ from tenants.models import (
 
 class MockTestMixin:
     @classmethod
-    def create_bare_minimum_category(cls, project: Project):
+    def create_bare_minimum_category(cls, project: Project) -> Category:
         return Category.objects.create(
             project=project,
             name=''.join(random.choices(string.ascii_lowercase, k=6))
         )
 
     @classmethod
-    def create_bare_minimum_endpoint(cls, project: Optional[Project] = None):
+    def create_bare_minimum_endpoint(
+            cls,
+            project: Optional[Project] = None,
+            path: str = "/foo/bar"
+    ) -> Endpoint:
         if not project:
             project = cls.create_bare_minimum_project()
         endpoint = Endpoint.objects.create(
-            path="/foo/bar",
+            path=path,
         )
         endpoint.categories.add(cls.create_bare_minimum_category(project))
 
         return endpoint
 
     @classmethod
-    def create_bare_minimum_verb(cls, organization: Organization):
+    def create_bare_minimum_verb(cls, organization: Organization) -> HttpVerb:
         verb, _ = HttpVerb.objects.get_or_create(
             name="GET",
             organization=organization
@@ -55,14 +59,14 @@ class MockTestMixin:
         return tenant
 
     @classmethod
-    def create_bare_minimum_project(cls, organization: Optional[Organization] = None):
+    def create_bare_minimum_project(cls, organization: Organization) -> Project:
         return Project.objects.create(
             name="foobar",
             organization=organization
         )
 
     @classmethod
-    def create_bare_minimum_organization(cls, tenant: Optional[Tenant] = None):
+    def create_bare_minimum_organization(cls, tenant: Optional[Tenant] = None) -> Organization:
         org = Organization.objects.create(
             name="foobar",
             uuid=uuid4()
@@ -77,7 +81,7 @@ class MockTestMixin:
 
     @classmethod
     def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None, project: Optional[Project] =
-                                None):
+                                None) -> Mock:
         organization = cls.create_bare_minimum_organization(tenant)
         if not project:
             project = cls.create_bare_minimum_project(organization)

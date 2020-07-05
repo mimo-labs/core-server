@@ -40,12 +40,12 @@ class Endpoint(DateAwareModel):
         related_name="endpoints",
     )
 
+    def __str__(self):
+        return self.path
+
     @property
     def project(self):
         return self.categories.first().project
-
-    def __str__(self):
-        return self.path
 
 
 class Content(DateAwareModel):
