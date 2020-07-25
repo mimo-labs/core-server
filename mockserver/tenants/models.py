@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.template.defaultfilters import slugify
 
 from authentication.models import User
 from common.models import DateAwareModel
@@ -12,6 +13,10 @@ class Project(DateAwareModel):
     name = models.CharField(
         max_length=255
     )
+    record_name = models.SlugField(
+        max_length=255,  # RFC 1035
+        null=True
+    )
     organization = models.ForeignKey(
         'tenants.Organization',
         on_delete=models.CASCADE,
@@ -19,6 +24,7 @@ class Project(DateAwareModel):
     )
 
     def save(self, *args, **kwargs):
+        self.record_name = slugify(self.name)
         project = super().save(*args, **kwargs)
         Category.objects.create(
             name="Uncategorized",
