@@ -27,9 +27,11 @@ def fetch_mock(request):
     query_params = {**request.GET.dict(), **request.POST.dict(), **request.data}
     mock_route = request.path.rstrip('/')
 
+    endpoint = MockService.get_mock_endpoint(mock_route, request.project)
+
     mock = MockService.get_tenant_mocks(
-        request.organization,
-        mock_route,
+        request.project,
+        endpoint,
         request.method,
         query_params
     )

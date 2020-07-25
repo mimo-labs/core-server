@@ -14,5 +14,10 @@ def tenancy_required(fn):
                 {'detail': 'organization does not exist'},
                 status=HTTP_404_NOT_FOUND
             )
+        if request.project is None:
+            return JsonResponse(
+                {'detail': 'project does not exist'},
+                status=HTTP_404_NOT_FOUND
+            )
         return fn(request, *args, **kwargs)
     return wrap
