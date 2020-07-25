@@ -25,7 +25,7 @@ class Category(DateAwareModel):
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} (project id: {self.project.id})"
 
 
 class Endpoint(DateAwareModel):
@@ -122,7 +122,7 @@ class Mock(DateAwareModel):
                     mock=self
                 )
 
-        active_mocks = Mock.objects.filter(
+        active_mocks = Mock.objects.exclude(id=self.pk).filter(
             path=self.path,
             is_active=True
         )
