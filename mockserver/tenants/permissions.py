@@ -2,7 +2,8 @@ from rest_framework import permissions
 
 from tenants.models import (
     Organization,
-    OrganizationMembership
+    OrganizationMembership,
+    Project,
 )
 
 
@@ -96,3 +97,31 @@ class IsOrganizationAdminOrOwnerPermission(permissions.BasePermission):
             IsOrganizationOwnerPermission().has_object_permission(*args)
             or IsOrganizationAdminPermission().has_object_permission(*args)
         )
+
+
+class IsOwnProject(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if view.action != 'list':
+            return True
+
+        project_id = request.GET.get('project_id')
+        # In case no project id, we let it go through and fail later
+        if not project_id:
+            return True
+
+        # In case project does not exist, we let it go through and fail later
+        if not Project.objects.filter(id=project_id).exists():
+            return True
+
+        tenant = request.user.tenant
+        for org in tenant.organizations.all():
+            if project_id in [str(proj.id) for proj in org.project_set.all()]:
+                return True
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        object_organization = obj.project.organization
+        tenant = request.user.tenant
+
+        return object_organization in tenant.organizations.all()
