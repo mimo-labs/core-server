@@ -26,7 +26,8 @@ def project_from_request(request):
     project_name = hostname_from_request(request)[1]
     try:
         return Project.objects.get(
-            name=project_name
+            record_name=project_name,
+            organization=request.organization
         )
     except (Project.DoesNotExist, ValidationError):
         return None
