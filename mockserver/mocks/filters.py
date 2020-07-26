@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from mocks.models import Mock
+from mocks.models import Mock, Category
 
 
 class MockFilterSet(filters.FilterSet):
@@ -18,4 +18,17 @@ class MockFilterSet(filters.FilterSet):
             'title',
             'verb',
             'status_code',
+        ]
+
+
+class CategoryFilterSet(filters.FilterSet):
+    project_id = filters.NumberFilter(
+        field_name="project",
+        required=True,
+    )
+
+    class Meta:
+        model = Category
+        fields = [
+            'project',
         ]
