@@ -232,3 +232,43 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, 200)
+
+
+class TenantViewsetTestCase(MockTestMixin, APITestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+    def setUp(self):
+        self.tenant = self.create_bare_minimum_tenant()
+        self.organization = self.create_bare_minimum_organization(self.tenant)
+        self.project = self.create_bare_minimum_project(self.organization)
+        self.client.defaults['SERVER_NAME'] = "%s.%s.localhost" % (
+            self.organization.uuid,
+            self.project.record_name
+        )
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+
+    def test_get_no_organization_errors(self):
+        url = reverse('v1:tenant-list')
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_organization_param_returns_tenants(self):
+        url = reverse('v1:tenant-list')
+
+        response = self.client.get(url, {'organization_id': self.organization.id})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['id'], self.tenant.id)
+
+    def test_get_nonexistent_organization_returns_empty(self):
+        url = reverse('v1:tenant-list')
+
+        response = self.client.get(url, {'organization_id': self.organization.id + 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
