@@ -62,18 +62,32 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
         self.assertEqual(response.status_code, self.mock.status_code)
         self.assertEqual(response[header.header_type.name], header.value)
 
-    def test_non_existent_tenant_returns_404(self):
-        response = self.c.get(self.mock.path.path, HTTP_HOST=f'{uuid4()}.localhost')
+    def test_non_existent_organization_returns_404(self):
+        response = self.c.get(self.mock.path.path, HTTP_HOST=f'{uuid4()}.noproject.localhost')
 
         self.assertEqual(response.status_code, 404)
         self.assertDictEqual(response.json(), {'detail': 'organization does not exist'})
 
-    @patch('mocks.services.MockService.get_tenant_mocks')
-    def test_non_existent_mock_returns_404(self, patch_get_mock):
-        patch_get_mock.return_value = None
+    def test_non_existent_project_returns_404(self):
+        host_string = f'{self.mock.project.organization.uuid}.noproject.localhost'
 
+        response = self.c.get(self.mock.path.path, HTTP_HOST=host_string)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertDictEqual(response.json(), {'detail': 'project does not exist'})
+
+    def test_non_existent_mock_path_returns_404(self):
         response = self.c.get(
             '/does/not/exist',
+            HTTP_HOST=f'{self.host}.localhost'
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertDictEqual(response.json(), {'detail': 'mock does not exist'})
+
+    def test_non_existent_mock_method_returns_404(self):
+        response = self.c.post(
+            self.mock.path.path,
             HTTP_HOST=f'{self.host}.localhost'
         )
 
