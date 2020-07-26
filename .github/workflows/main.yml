@@ -17,7 +17,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v1
+    - uses: actions/cache@v2
       id: cache
       with:
         path: ~/.cache/pip
@@ -32,7 +32,7 @@ jobs:
       run: |
         sudo apt install libpq-dev
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --ignore-installed -r requirements.txt
     - name: Lint with flake8
       run: |
         pip install flake8
