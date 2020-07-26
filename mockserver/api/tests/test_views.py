@@ -27,7 +27,7 @@ class MockAPIFetchViewTestCase(TestCase, MockTestMixin):
         self.header_type = HeaderType.objects.create(
             name="Foo"
         )
-        self.host = self.mock.project.organization.uuid
+        self.host = f"{self.mock.project.organization.uuid}.{self.mock.project.record_name}"
 
     @patch('mocks.services.MockService.get_tenant_mocks')
     def test_list_mock_is_allowed(self, patch_get_mock):

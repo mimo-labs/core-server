@@ -12,6 +12,7 @@ from api.permissions import (
     IsOrganizationTenantPermission
 )
 from authentication.decorators.tenant_view import tenancy_required
+from mocks.models import Endpoint
 from mocks.services import MockService
 
 
@@ -27,7 +28,13 @@ def fetch_mock(request):
     query_params = {**request.GET.dict(), **request.POST.dict(), **request.data}
     mock_route = request.path.rstrip('/')
 
-    endpoint = MockService.get_mock_endpoint(mock_route, request.project)
+    try:
+        endpoint = MockService.get_mock_endpoint(mock_route, request.project)
+    except Endpoint.DoesNotExist:
+        return JsonResponse(
+            {'detail': 'mock does not exist'},
+            status=HTTP_404_NOT_FOUND
+        )
 
     mock = MockService.get_tenant_mocks(
         request.project,

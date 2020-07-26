@@ -1,6 +1,5 @@
 from unittest.mock import (
     patch,
-    MagicMock,
     Mock
 )
 
@@ -17,7 +16,7 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
         self.project = self.create_bare_minimum_project(self.organization)
         self.client.defaults['SERVER_NAME'] = "%s.%s.localhost" % (
             self.organization.uuid,
-            self.project.name
+            self.project.record_name
         )
 
     def test_unauthenticated_requests_are_disallowed(self):
@@ -99,7 +98,6 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
             self.assertEqual(response.status_code, 403)
 
-    @patch('tenants.views.Organization.objects', new=MagicMock())
     def test_authenticated_list_requests_are_allowed(self):
         url = reverse('v1:organization-list')
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
@@ -113,7 +111,6 @@ class OrganizationViewSetTestCase(MockTestMixin, APITestCase):
 
             self.assertEqual(response.status_code, 400)  # invalid but allowed creation request
 
-    @patch('tenants.views.Organization.objects', new=MagicMock())
     def test_authenticated_member_detail_is_allowed(self):
         url = reverse('v1:organization-detail', kwargs={'pk': self.organization.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
