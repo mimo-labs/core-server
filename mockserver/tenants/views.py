@@ -8,6 +8,7 @@ from rest_framework import (
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
+from tenants.filters import TenantFilter
 from tenants.models import (
     Tenant,
     Organization,
@@ -42,6 +43,7 @@ class ProjectViewset(viewsets.ModelViewSet):
 class TenantViewSet(viewsets.ModelViewSet):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
+    filter_class = TenantFilter
 
     def get_permissions(self):
         if self.action == 'create':
