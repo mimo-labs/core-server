@@ -1,25 +1,15 @@
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 
-from common.tests.mixins import MockTestMixin
+from common.tests.testcases import APIViewSetTestCase
+from tenants.models import Project
 
 
-class MockViewSetTestCase(APITestCase, MockTestMixin):
+class MockViewSetTestCase(APIViewSetTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.tenant = cls.create_bare_minimum_tenant()
-        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
-        cls.project = cls.create_bare_minimum_project(cls.organization)
+    def setUpTestData(cls):
+        super().setUpTestData()
         cls.token = Token.objects.get(user=cls.tenant)
-
-    def setUp(self):
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
-        self.mock = self.create_bare_minimum_mock(self.tenant, self.project)
 
     def test_unauthenticated_detail_request_is_disallowed(self):
         url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})
@@ -94,20 +84,11 @@ class MockViewSetTestCase(APITestCase, MockTestMixin):
         self.assertEqual(1, len(response.json()))
 
 
-class CategoryViewSetTestCase(APITestCase, MockTestMixin):
+class CategoryViewSetTestCase(APIViewSetTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.tenant = cls.create_bare_minimum_tenant()
-        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
-        cls.project = cls.create_bare_minimum_project(cls.organization)
+    def setUpTestData(cls):
+        super().setUpTestData()
         cls.token = Token.objects.get(user=cls.tenant)
-
-    def setUp(self):
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
 
     def test_list_without_project_id_fails(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
@@ -131,8 +112,9 @@ class CategoryViewSetTestCase(APITestCase, MockTestMixin):
     def test_list_with_nonexistent_project_returns_404(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         url = reverse('v1:category-list')
+        last_project_id = Project.objects.last().id
 
-        response = self.client.get(url, {'project_id': self.project.id + 1})
+        response = self.client.get(url, {'project_id': last_project_id + 1})
 
         self.assertEqual(404, response.status_code)
 
@@ -148,24 +130,15 @@ class CategoryViewSetTestCase(APITestCase, MockTestMixin):
         response = self.client.get(url, {'project_id': self.project.id})
 
         self.assertEqual(200, response.status_code)
-        # 2 categories: default for project, and a custom created one
-        self.assertEqual(2, len(response.json()))
+        # 3 categories: default for project, default for mock, and a custom created one
+        self.assertEqual(3, len(response.json()))
 
 
-class EndpointViewSetTestCase(APITestCase, MockTestMixin):
+class EndpointViewSetTestCase(APIViewSetTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.tenant = cls.create_bare_minimum_tenant()
-        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
-        cls.project = cls.create_bare_minimum_project(cls.organization)
         cls.token = Token.objects.get(user=cls.tenant)
-
-    def setUp(self):
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
 
     def test_list_without_project_id_fails(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
@@ -206,4 +179,5 @@ class EndpointViewSetTestCase(APITestCase, MockTestMixin):
         response = self.client.get(url, {'project_id': self.project.id})
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
+        # 2 endpoints: one created now, one for the base case mock
+        self.assertEqual(2, len(response.json()))

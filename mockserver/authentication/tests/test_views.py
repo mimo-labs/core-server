@@ -4,10 +4,6 @@ from unittest.mock import (
     Mock
 )
 
-from django.test import (
-    TestCase,
-    Client
-)
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.status import (
@@ -16,25 +12,14 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_204_NO_CONTENT
 )
-from rest_framework.test import APIClient, APITestCase
 
 from authentication.models import User, OneOffToken
-from common.tests.mixins import MockTestMixin
+from common.tests.testcases import APIViewSetTestCase
 
 
-class LoginViewTestCase(TestCase, MockTestMixin):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.organization = cls.create_bare_minimum_organization()
-        cls.project = cls.create_bare_minimum_project(cls.organization)
-
+class LoginViewTestCase(APIViewSetTestCase):
     def setUp(self):
-        self.client = Client()
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
+        super().setUp()
         self.user_data = {
             "email": "foo@bar.baz",
             "password": "aaaaaa"
@@ -75,7 +60,7 @@ class LoginViewTestCase(TestCase, MockTestMixin):
         self.assertIn('id', json.loads(response.content))
 
 
-class LogoutViewTestCase(TestCase, MockTestMixin):
+class LogoutViewTestCase(APIViewSetTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -83,20 +68,14 @@ class LogoutViewTestCase(TestCase, MockTestMixin):
             "email": "foo@bar.baz",
             "password": "aaaaaa"
         }
-        cls.organization = cls.create_bare_minimum_organization()
-        cls.project = cls.create_bare_minimum_project(cls.organization)
 
     def setUp(self):
-        self.client = APIClient()
+        super().setUp()
         self.user = User.objects.create(
             **self.user_data
         )
         self.token = self.user.auth_token
         self.url = reverse("logout")
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
 
     def test_successful_logout_destroys_token(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
@@ -114,21 +93,12 @@ class LogoutViewTestCase(TestCase, MockTestMixin):
         self.assertJSONEqual(response.content, {'detail': 'Invalid token.'})
 
 
-class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
+class PasswordResetRequestViewTestCase(APIViewSetTestCase):
     @classmethod
     def setUpClass(cls):
         super(PasswordResetRequestViewTestCase, cls).setUpClass()
-        cls.client = APIClient()
         cls.url = reverse('password_reset_request')
         cls.user = cls.create_bare_minimum_tenant()
-        cls.organization = cls.create_bare_minimum_organization(cls.user)
-        cls.project = cls.create_bare_minimum_project(cls.organization)
-
-    def setUp(self):
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
 
     def test_junk_data_raises_error(self):
         request_data = {'email': 'aninvalidmail'}
@@ -181,20 +151,11 @@ class PasswordResetRequestViewTestCase(TestCase, MockTestMixin):
         self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
 
 
-class PasswordResetTestCase(APITestCase, MockTestMixin):
+class PasswordResetTestCase(APIViewSetTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.url = reverse('password_reset')
-        cls.tenant = cls.create_bare_minimum_tenant()
-        cls.organization = cls.create_bare_minimum_organization(cls.tenant)
-        cls.project = cls.create_bare_minimum_project(cls.organization)
-
-    def setUp(self):
-        self.client.defaults["SERVER_NAME"] = "%s.%s.localhost" % (
-            self.organization.uuid,
-            self.project.name
-        )
 
     def test_regular_token_is_allowed(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
