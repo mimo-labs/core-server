@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,8 +28,18 @@ SECRET_KEY = '#mgydf9z!#f#=9^a@_6-^4kr$5l+_x1bp43*2t=bfudu6f@c43'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ENVIRONMENT = os.getenv('ENVIRONMENT', "development")
+SENTRY_DSN = os.getenv('SENTRY_DSN')
 
 ALLOWED_HOSTS = ["*"]
+
+if not DEBUG and SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=ENVIRONMENT,
+        send_default_pii=True,
+    )
 
 
 # Application definition
