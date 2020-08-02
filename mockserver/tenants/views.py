@@ -7,6 +7,7 @@ from rest_framework import (
 )
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from tenants.filters import TenantFilter
 from tenants.models import (
@@ -86,6 +87,19 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         elif self.action == "profile":
             return OrganizationProfileSerializer
         return OrganizationSerializer
+
+    def list(self, request, *args, **kwargs):
+        # We scope organizations list to only the requesting user's organizations
+        tenant = request.user.tenant
+        queryset = tenant.organizations.all()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @transaction.atomic
     @swagger_auto_schema(method='post', request_body=OrganizationInviteSchema,
