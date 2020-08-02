@@ -48,7 +48,7 @@ class ProjectViewset(viewsets.ModelViewSet):
             organization_id = self.request.GET.get('organization_id')
             if organization_id is None:
                 raise ValidationError(
-                    detail={'detail': 'project_id is required'},
+                    detail={'detail': 'organization_id is required'},
                 )
             qs = qs.filter(organization=organization_id)
         return qs

@@ -6,7 +6,7 @@ from unittest.mock import (
 from rest_framework.reverse import reverse
 
 from common.tests.testcases import APIViewSetTestCase
-from tenants.models import OrganizationMembership
+from tenants.models import OrganizationMembership, Organization
 
 
 class OrganizationViewSetTestCase(APIViewSetTestCase):
@@ -252,9 +252,42 @@ class TenantViewsetTestCase(APIViewSetTestCase):
 
     def test_get_nonexistent_organization_returns_empty(self):
         url = reverse('v1:tenant-list')
+        last_id = Organization.objects.last().id
 
-        response = self.client.get(url, {'organization_id': self.organization.id + 1})
+        response = self.client.get(url, {'organization_id': last_id + 1})
 
         self.assertEqual(response.status_code, 200)
-        # 1 tenant created during test bootstrap
-        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(len(response.json()), 0)
+
+
+class ProjectViewsetTestCase(APIViewSetTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+
+    def test_list_without_organization_id_errors(self):
+        url = reverse('v1:project-list')
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['detail'], "organization_id is required")
+
+    def test_list_with_organization_id_returns_projects(self):
+        url = reverse('v1:project-list')
+        self.create_bare_minimum_project(self.create_bare_minimum_organization())
+
+        response = self.client.get(url, {'organization_id': self.organization.id})
+
+        self.assertEqual(response.status_code, 200)
+        # Dummy project and custom created project
+        self.assertEqual(len(response.json()), 2)
+
+    def test_list_with_nonexistent_organization_returns_empty(self):
+        url = reverse('v1:tenant-list')
+        last_id = Organization.objects.last().id
+
+        response = self.client.get(url, {'organization_id': last_id + 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
