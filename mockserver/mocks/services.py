@@ -31,7 +31,8 @@ class MockService(Service):
             mock = Mock.objects.get(
                 path=path,
                 verb__name=verb,
-                is_active=True
+                is_active=True,
+                is_complete=True,
             )
         except Mock.DoesNotExist:
             return None

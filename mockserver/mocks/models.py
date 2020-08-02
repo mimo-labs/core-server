@@ -82,7 +82,8 @@ class Params(DateAwareModel):
 class Mock(DateAwareModel):
     title = models.CharField(
         max_length=255,
-        unique=True
+        unique=True,
+        null=True,
     )
     verb = models.ForeignKey(
         'mocks.HttpVerb',
@@ -110,6 +111,8 @@ class Mock(DateAwareModel):
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
+        if self.path and self.verb and self.status_code:
+            self.is_complete = True
 
         super().save(*args, **kwargs)
 
