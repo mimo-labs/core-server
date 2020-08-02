@@ -46,6 +46,7 @@ class OrganizationThinSerializer(serializers.ModelSerializer):
             'id',
             'uuid',
             'profile',
+            'name',
         )
 
 
