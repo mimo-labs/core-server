@@ -15,9 +15,13 @@ class IsOwnOrganization(permissions.BasePermission):
         if view.action != 'list':
             return True
 
-        organization_id = int(request.query_params.get('organization'))
+        organization_id = request.query_params.get('organization_id')
 
-        return organization_id in [
+        # Propagate the missing id to fail later on
+        if organization_id is None:
+            return True
+
+        return int(organization_id) in [
             org.id for
             org in
             request.user.tenant.organizations.all()
