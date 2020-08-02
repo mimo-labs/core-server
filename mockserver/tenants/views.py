@@ -6,6 +6,7 @@ from rest_framework import (
     status
 )
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -39,6 +40,18 @@ class ProjectViewset(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = (IsOwnOrganization,)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if self.action == 'list':
+            organization_id = self.request.GET.get('organization_id')
+            if organization_id is None:
+                raise ValidationError(
+                    detail={'detail': 'organization_id is required'},
+                )
+            qs = qs.filter(organization=organization_id)
+        return qs
 
 
 class TenantViewSet(viewsets.ModelViewSet):
