@@ -98,7 +98,10 @@ class Mock(DateAwareModel):
         default=200
     )
     is_active = models.BooleanField(
-        default=True
+        default=False
+    )
+    is_complete = models.BooleanField(
+        default=False
     )
 
     @property
