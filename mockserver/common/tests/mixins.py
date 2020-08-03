@@ -59,7 +59,9 @@ class MockTestMixin:
         return tenant
 
     @classmethod
-    def create_bare_minimum_project(cls, organization: Organization) -> Project:
+    def create_bare_minimum_project(cls, organization: Optional[Organization] = None) -> Project:
+        if not organization:
+            organization = cls.create_bare_minimum_organization()
         return Project.objects.create(
             name="foobar",
             organization=organization
@@ -81,13 +83,16 @@ class MockTestMixin:
 
     @classmethod
     def create_bare_minimum_mock(cls, tenant: Optional[Tenant] = None, project: Optional[Project] =
-                                None) -> Mock:
+                                 None, endpoint: Optional[Endpoint] = None) -> Mock:
         organization = cls.create_bare_minimum_organization(tenant)
         if not project:
             project = cls.create_bare_minimum_project(organization)
+        if not endpoint:
+            endpoint = cls.create_bare_minimum_endpoint(project)
         return Mock.objects.create(
             title="".join(random.choices(string.ascii_lowercase, k=6)),
-            path=cls.create_bare_minimum_endpoint(project),
+            path=endpoint,
             verb=cls.create_bare_minimum_verb(organization),
             status_code=205,
+            is_active=True,
         )

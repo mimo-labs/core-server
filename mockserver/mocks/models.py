@@ -111,7 +111,7 @@ class Mock(DateAwareModel):
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
-        if self.path and self.verb and self.status_code:
+        if self.path and self.title:
             self.is_complete = True
 
         super().save(*args, **kwargs)
