@@ -132,3 +132,5 @@ static/
 .direnv/
 .vim/
 tags
+
+docker-compose.override.yml

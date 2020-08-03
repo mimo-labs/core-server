@@ -47,8 +47,8 @@ class ParamsSerializer(serializers.ModelSerializer):
 
 
 class MockSerializer(serializers.ModelSerializer):
-    path = serializers.PrimaryKeyRelatedField(queryset=Endpoint.objects.all(), allow_null=False)
-    verb = serializers.PrimaryKeyRelatedField(queryset=HttpVerb.objects.all(), allow_null=False)
+    path = serializers.PrimaryKeyRelatedField(queryset=Endpoint.objects.all(), allow_null=True)
+    verb = serializers.PrimaryKeyRelatedField(queryset=HttpVerb.objects.all(), allow_null=True)
 
     headers = HeaderSerializer(many=True)
     mock_content = serializers.JSONField(write_only=True)
