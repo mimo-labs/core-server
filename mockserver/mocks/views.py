@@ -16,6 +16,7 @@ from mocks.serializers import (
     CategorySerializer,
     EndpointSerializer,
 )
+from tenants.models import Project
 from tenants.permissions import (
     IsOwnOrganization,
     IsOwnProject,
@@ -37,12 +38,13 @@ class MockViewset(viewsets.ModelViewSet):
                     detail={'detail': 'project_id is required'},
                 )
             category_qs = Category.objects.filter(project_id=project_id)
-            qs = qs.filter(path__categories__in=category_qs)
-            if not qs.exists():
+            # At least 1 category is always present for a project
+            # If there isn't any, the project doesn't exist at all
+            if not category_qs.exists():
                 raise NotFound(
                     detail='project does not exist',
                 )
-
+            qs = qs.filter(path__categories__in=category_qs)
         return qs
 
 
@@ -72,12 +74,11 @@ class CategoryViewset(viewsets.ModelViewSet):
                 raise ValidationError(
                     detail={'detail': 'project_id is required'},
                 )
-            qs = qs.filter(project_id=project_id)
-            if not qs.exists():
+            if Project.objects.filter(id=project_id).count() < 1:
                 raise NotFound(
                     detail='project does not exist',
                 )
-
+            qs = qs.filter(project_id=project_id)
         return qs
 
 
@@ -96,10 +97,11 @@ class EndpointViewset(viewsets.ModelViewSet):
                     detail={'detail': 'project_id is required'},
                 )
             category_qs = Category.objects.filter(project_id=project_id)
-            qs = qs.filter(categories__in=category_qs)
-            if not qs.exists():
+            # At least 1 category is always present for a project
+            # If there isn't any, the project doesn't exist at all
+            if not category_qs.exists():
                 raise NotFound(
                     detail='project does not exist',
                 )
-
+            qs = qs.filter(categories__in=category_qs)
         return qs
