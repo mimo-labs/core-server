@@ -65,8 +65,9 @@ class MockViewSetTestCase(APIViewSetTestCase):
     def test_list_with_nonexistent_project_returns_404(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         url = reverse('v1:mock-list')
+        last_project_id = Project.objects.last().id
 
-        response = self.client.get(url, {'project_id': self.project.id + 1})
+        response = self.client.get(url, {'project_id': last_project_id + 1})
 
         self.assertEqual(404, response.status_code)
 
@@ -162,8 +163,9 @@ class EndpointViewSetTestCase(APIViewSetTestCase):
     def test_list_with_nonexistent_project_returns_404(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         url = reverse('v1:endpoint-list')
+        last_project_id = Project.objects.last().id
 
-        response = self.client.get(url, {'project_id': self.project.id + 1})
+        response = self.client.get(url, {'project_id': last_project_id + 1})
 
         self.assertEqual(404, response.status_code)
 
