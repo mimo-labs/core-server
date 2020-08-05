@@ -128,15 +128,18 @@ class Mock(DateAwareModel):
                     mock=self
                 )
 
-        active_mocks = Mock.objects.exclude(id=self.pk).filter(
-            path=self.path,
-            is_active=True
-        )
+        if self.is_active:
+            active_mocks = Mock.objects.exclude(id=self.pk).filter(
+                path=self.path,
+                is_active=True
+            )
 
-        if active_mocks.exists():
-            active_mocks.update(is_active=False)
+            if active_mocks.exists():
+                active_mocks.update(is_active=False)
 
     def __str__(self):
+        if not self.title:
+            return super().__str__()
         return self.title
 
 
