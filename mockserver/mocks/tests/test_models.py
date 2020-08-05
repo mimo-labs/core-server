@@ -51,3 +51,11 @@ class MockTestCase(MockTestMixin, TestCase):
         mock.refresh_from_db()
 
         self.assertTrue(mock.is_active)
+
+    def test_equal_mocks_with_new_inactive_leaves_oldest_active(self):
+        mock = self.create_bare_minimum_mock()
+
+        Mock.objects.create(path=mock.path, verb=mock.verb, is_active=False)
+        mock.refresh_from_db()
+
+        self.assertTrue(mock.is_active)
