@@ -21,6 +21,11 @@ class IsOwnOrganization(permissions.BasePermission):
         if organization_id is None:
             return True
 
+        # Propagate if the organization doesn't exist. this is handled
+        # by the views
+        if Organization.objects.filter(id=organization_id).count() < 1:
+            return True
+
         return int(organization_id) in [
             org.id for
             org in
