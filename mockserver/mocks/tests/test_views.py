@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 from common.tests.testcases import APIViewSetTestCase
-from tenants.models import Project
+from tenants.models import Project, Organization
 
 
 class MockViewSetTestCase(APIViewSetTestCase):
@@ -183,3 +183,46 @@ class EndpointViewSetTestCase(APIViewSetTestCase):
         self.assertEqual(200, response.status_code)
         # 2 endpoints: one created now, one for the base case mock
         self.assertEqual(2, len(response.json()))
+
+
+class HttpVerbViewSetTestCase(APIViewSetTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.token = Token.objects.get(user=cls.tenant)
+        cls.url = reverse('v1:httpverb-list')
+
+    def test_list_without_organization_is_denied(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(400, response.status_code)
+        self.assertEqual('organization_id is required', response.json()['detail'])
+
+    def test_list_with_nonexistent_organization_returns_404(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+        last_organization_id = Organization.objects.last().id
+
+        response = self.client.get(self.url, {'organization_id': last_organization_id + 1})
+
+        self.assertEqual(404, response.status_code)
+        self.assertEqual('organization does not exist', response.json()['detail'])
+
+    def test_list_with_unauthorized_organization_is_denied(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+        other_organization = self.create_bare_minimum_organization()
+
+        response = self.client.get(self.url, {'organization_id': other_organization.id})
+
+        self.assertEqual(403, response.status_code)
+
+    def test_list_with_authorized_organization_returns_scoped(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+        # This creates 5 more verbs
+        self.create_bare_minimum_organization()
+
+        response = self.client.get(self.url, {'organization_id': self.organization.id})
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(5, len(response.json()))
