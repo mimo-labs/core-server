@@ -54,10 +54,13 @@ class MockSerializer(serializers.ModelSerializer):
     mock_content = serializers.JSONField(write_only=True)
     mock_params = serializers.JSONField(write_only=True)
 
+    project_id = serializers.CharField(allow_null=True, write_only=True, source='project')
+
     def create(self, validated_data):
         headers = validated_data.pop('headers')
         content = validated_data.pop('mock_content')
         params = validated_data.pop('mock_params')
+        validated_data.pop('project')  # TODO: use this when validating project
 
         mock = Mock.objects.create(**validated_data)
 
@@ -93,6 +96,7 @@ class MockSerializer(serializers.ModelSerializer):
             'content',
             'params',
             'headers',
+            'project_id',
         )
         read_only_fields = (
             'content',

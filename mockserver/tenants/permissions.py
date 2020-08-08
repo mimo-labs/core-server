@@ -1,4 +1,4 @@
-from rest_framework import permissions
+from rest_framework import permissions, exceptions
 
 from tenants.models import (
     Organization,
@@ -110,17 +110,22 @@ class IsOrganizationAdminOrOwnerPermission(permissions.BasePermission):
 
 class IsOwnProject(permissions.BasePermission):
     def has_permission(self, request, view):
-        if view.action != 'list':
-            return True
+        # This permission handles the case for list and create requests
+        # The problem is, django sends data for both on separate objects
+        # one of them being an abstraction over dicts that interpretes query params
+        # as lists, regardless of syntax. So we need its underlying dict
+        data = {**request.data, **request.query_params.dict()}
+        project_id = data.get('project_id')
 
-        project_id = request.GET.get('project_id')
         # In case no project id, we let it go through and fail later
+        # TODO: Is this right here? review viewset execution order
         if not project_id:
             return True
 
-        # In case project does not exist, we let it go through and fail later
         if not Project.objects.filter(id=project_id).exists():
-            return True
+            raise exceptions.NotFound(
+                detail="project does not exist",
+            )
 
         tenant = request.user.tenant
         for org in tenant.organizations.all():

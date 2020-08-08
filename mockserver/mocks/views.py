@@ -38,12 +38,6 @@ class MockViewset(viewsets.ModelViewSet):
                     detail={'detail': 'project_id is required'},
                 )
             category_qs = Category.objects.filter(project_id=project_id)
-            # At least 1 category is always present for a project
-            # If there isn't any, the project doesn't exist at all
-            if not category_qs.exists():
-                raise NotFound(
-                    detail='project does not exist',
-                )
             qs = qs.filter(path__categories__in=category_qs)
         return qs
 
