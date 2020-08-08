@@ -26,7 +26,6 @@ class IsOwnOrganization(permissions.BasePermission):
         if Organization.objects.filter(id=organization_id).count() < 1:
             return True
 
-
         return int(organization_id) in [
             org.id for
             org in
