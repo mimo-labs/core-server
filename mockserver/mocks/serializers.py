@@ -109,6 +109,7 @@ class HeaderTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = HeaderType
         fields = (
+            'id',
             'name',
             'organization',
         )
@@ -123,6 +124,7 @@ class HttpVerbSerializer(serializers.ModelSerializer):
     class Meta:
         model = HttpVerb
         fields = (
+            'id',
             'name',
             'organization',
         )
