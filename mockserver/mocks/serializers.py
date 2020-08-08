@@ -60,6 +60,7 @@ class MockSerializer(serializers.ModelSerializer):
         headers = validated_data.pop('headers')
         content = validated_data.pop('mock_content')
         params = validated_data.pop('mock_params')
+        validated_data.pop('project')  # TODO: use this when validating project
 
         mock = Mock.objects.create(**validated_data)
 
