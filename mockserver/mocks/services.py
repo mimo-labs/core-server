@@ -4,6 +4,7 @@ from django.http import (
 
 from common.services import Service
 from mocks.models import Mock, Endpoint, Category
+from tenants.constants import DEFAULT_PROJECT_CATEGORY_NAME
 from tenants.models import Project
 
 
@@ -21,7 +22,7 @@ class EndpointService(Service):
         )
 
         if created:
-            uncategorized = categories.get(name='Uncategorized')  # TODO: extract to constant
+            uncategorized = categories.get(name=DEFAULT_PROJECT_CATEGORY_NAME)
             endpoint.categories.add(uncategorized)
             endpoint.save()
 

@@ -5,6 +5,7 @@ from django.template.defaultfilters import slugify
 
 from authentication.models import User
 from common.models import DateAwareModel
+from tenants.constants import DEFAULT_PROJECT_CATEGORY_NAME
 from tenants.tasks import mail_membership_invite
 from mocks.models import Category
 
@@ -27,7 +28,7 @@ class Project(DateAwareModel):
         self.record_name = slugify(self.name)
         project = super().save(*args, **kwargs)
         Category.objects.create(
-            name="Uncategorized",
+            name=DEFAULT_PROJECT_CATEGORY_NAME,
             project=self,
         )
 
