@@ -4,7 +4,29 @@ from django.http import (
 
 from common.services import Service
 from mocks.models import Mock, Endpoint, Category
+from tenants.constants import DEFAULT_PROJECT_CATEGORY_NAME
 from tenants.models import Project
+
+
+class EndpointService(Service):
+    model = Endpoint.objects
+
+    @classmethod
+    def get_endpoint_by_name_and_project(cls, path_name: str, project_id: int) -> Endpoint:
+        project = Project.objects.get(id=project_id)
+        categories = project.category_set.all()
+
+        endpoint, created = cls.model.get_or_create(
+            path=path_name,
+            categories__in=categories
+        )
+
+        if created:
+            uncategorized = categories.get(name=DEFAULT_PROJECT_CATEGORY_NAME)
+            endpoint.categories.add(uncategorized)
+            endpoint.save()
+
+        return endpoint
 
 
 class MockService(Service):

@@ -10,6 +10,7 @@ from mocks.models import (
     Content,
     Params,
 )
+from mocks.services import EndpointService
 from tenants.models import (
     Organization,
     Project,
@@ -47,7 +48,7 @@ class ParamsSerializer(serializers.ModelSerializer):
 
 
 class MockSerializer(serializers.ModelSerializer):
-    path = serializers.PrimaryKeyRelatedField(queryset=Endpoint.objects.all(), allow_null=True)
+    path = serializers.CharField(allow_null=True)
     verb = serializers.PrimaryKeyRelatedField(queryset=HttpVerb.objects.all(), allow_null=True)
 
     headers = HeaderSerializer(many=True)
@@ -60,7 +61,15 @@ class MockSerializer(serializers.ModelSerializer):
         headers = validated_data.pop('headers')
         content = validated_data.pop('mock_content')
         params = validated_data.pop('mock_params')
-        validated_data.pop('project')  # TODO: use this when validating project
+        path_name = validated_data.pop('path')
+        project_id = validated_data.pop('project')
+
+        if path_name:
+            # TODO: re-filling validated_data seems dirty. Investigate a better way
+            validated_data['path'] = EndpointService.get_endpoint_by_name_and_project(
+                path_name,
+                project_id
+            )
 
         mock = Mock.objects.create(**validated_data)
 
