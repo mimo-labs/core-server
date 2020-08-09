@@ -33,14 +33,16 @@ jobs:
         sudo apt install libpq-dev
         python -m pip install --upgrade pip
         pip install --ignore-installed -r requirements.txt
+    - name: Check for missing migrations
+      working-directory: ./mockserver
+      run: python manage.py makemigrations --check
     - name: Lint with flake8
       run: |
         pip install flake8
         flake8 .
     - name: Test with pytest
       working-directory: ./mockserver
-      run: |
-        python manage.py test
+      run: python manage.py test
 
   build-docker:
     runs-on: ubuntu-latest
