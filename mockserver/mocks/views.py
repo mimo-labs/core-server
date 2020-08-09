@@ -47,6 +47,24 @@ class HeaderTypeViewset(viewsets.ModelViewSet):
     serializer_class = HeaderTypeSerializer
     permission_classes = (IsOwnOrganization,)
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if self.action == 'list':
+            organization_id = self.request.GET.get('organization_id')
+            if organization_id is None:
+                raise ValidationError(
+                    detail={'detail': 'organization_id is required'},
+                )
+            qs = qs.filter(organization_id=organization_id)
+            # Verbs are mandatory and automatically bootstrapped for all orgs
+            # so if none exist for a given org id, that organization doesn't exist
+            if not qs.exists():
+                raise NotFound(
+                    detail='organization does not exist',
+                )
+        return qs
+
 
 class HttpVerbViewset(viewsets.ModelViewSet):
     queryset = HttpVerb.objects.all()
