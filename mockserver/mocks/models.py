@@ -93,7 +93,8 @@ class Mock(DateAwareModel):
     path = models.ForeignKey(
         'mocks.Endpoint',
         null=True,
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        related_name="mocks",
     )
     status_code = models.IntegerField(
         default=200
