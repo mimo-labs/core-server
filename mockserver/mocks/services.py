@@ -1,3 +1,5 @@
+import logging
+
 from django.http import (
     Http404,
 )
@@ -6,6 +8,9 @@ from common.services import Service
 from mocks.models import Mock, Endpoint, Category
 from tenants.constants import DEFAULT_PROJECT_CATEGORY_NAME
 from tenants.models import Project
+
+
+logger = logging.getLogger(__name__)
 
 
 class EndpointService(Service):
@@ -27,6 +32,16 @@ class EndpointService(Service):
             endpoint.save()
 
         return endpoint
+
+    @classmethod
+    def cleanup_endpoint(cls, endpoint: Endpoint):
+        any_endpoint_mocks = endpoint.mocks.all().exists()
+
+        if not any_endpoint_mocks:
+            logger.info("detected empty endpoint. deleting")
+            endpoint.delete()
+        else:
+            logger.info("endpoint not empty. skipping")
 
 
 class MockService(Service):

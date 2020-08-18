@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from common.tests.helpers import CaptureValues
 from common.tests.mixins import MockTestMixin
+from mocks.models import Endpoint
 from mocks.services import EndpointService
 from tenants.models import Project
 
@@ -56,3 +57,20 @@ class EndpointServiceTestCase(MockTestMixin, TestCase):
 
         with self.assertRaises(Project.DoesNotExist):
             self.service.get_endpoint_by_name_and_project("/aaaaaaaa", last_project_id + 1)
+
+    def test_cleanup_fails_with_null_endpoint(self):
+        with self.assertRaises(AttributeError):
+            self.service.cleanup_endpoint(None)
+
+    def test_cleanup_does_nothing_with_multiple_mocks(self):
+        with patch.object(Endpoint, 'delete') as patch_delete:
+            endpoint = self.create_bare_minimum_endpoint()
+            self.create_bare_minimum_mock(endpoint=endpoint)
+            self.service.cleanup_endpoint(endpoint)
+            self.assertFalse(patch_delete.called)
+
+    def test_cleanup_deletes_endpoint_with_no_mocks(self):
+        with patch.object(Endpoint, 'delete') as patch_delete:
+            empty_endpoint = self.create_bare_minimum_endpoint()
+            self.service.cleanup_endpoint(empty_endpoint)
+            self.assertTrue(patch_delete.called)
