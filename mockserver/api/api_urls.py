@@ -4,7 +4,6 @@ from mocks.views import (
     MockViewset,
     HeaderTypeViewset,
     HttpVerbViewset,
-    EndpointViewset,
     CategoryViewset,
 )
 from tenants.views import (
@@ -23,7 +22,6 @@ router.register('mocks', MockViewset)
 router.register('header-types', HeaderTypeViewset)
 router.register('http-verbs', HttpVerbViewset)
 router.register('categories', CategoryViewset)
-router.register('endpoints', EndpointViewset)
 router.register('projects', ProjectViewset)
 
 urlpatterns = router.urls
