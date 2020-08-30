@@ -109,6 +109,7 @@ class MockSerializer(serializers.ModelSerializer):
         model = Mock
         depth = 1
         fields = (
+            'id',
             'title',
             'path',
             'verb',
