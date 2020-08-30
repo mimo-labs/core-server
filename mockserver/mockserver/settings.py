@@ -213,4 +213,4 @@ IS_ADMIN_API = os.getenv("IS_ADMIN_API", "false").lower() == "true"
 APPEND_SLASH = IS_ADMIN_API
 
 # Celery settings
-CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+CELERY_ACCEPT_CONTENT = ['json']

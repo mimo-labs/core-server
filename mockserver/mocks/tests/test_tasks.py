@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
-from django.test import TransactionTestCase
+from django.test import TestCase
 
 from common.tests.mixins import MockTestMixin
 from mocks.tasks import delete_empty_endpoint
 
 
-class EndpointCleanupTaskTestCase(MockTestMixin, TransactionTestCase):
+class EndpointCleanupTaskTestCase(MockTestMixin, TestCase):
     task = delete_empty_endpoint
 
     def setUp(self):
@@ -20,20 +20,14 @@ class EndpointCleanupTaskTestCase(MockTestMixin, TransactionTestCase):
         super().setUpClass()
         cls.project = cls.create_bare_minimum_project()
         cls.endpoint = cls.create_bare_minimum_endpoint(project=cls.project)
-        cls.mock = cls.create_bare_minimum_mock(project=cls.project, endpoint=cls.endpoint)
-
-    def test_run_with_null_mock_does_nothing(self):
-        self.task(None)
-
-        self.assertFalse(self.mock_service.called)
 
     def test_run_with_unique_mock_calls_service_method(self):
-        self.task(self.mock)
+        self.task(self.endpoint.path, self.project.id)
 
         self.assertTrue(self.mock_service)
 
     def test_run_with_multiple_mocks_calls_service_method(self):
-        other_mock = self.create_bare_minimum_mock(project=self.project, endpoint=self.endpoint)
-        self.task(other_mock)
+        self.create_bare_minimum_mock(project=self.project, endpoint=self.endpoint)
+        self.task(self.endpoint.path, self.project.id)
 
         self.assertTrue(self.mock_service)
