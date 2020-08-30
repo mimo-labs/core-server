@@ -22,7 +22,6 @@ class EndpointCleanupTaskTestCase(MockTestMixin, TestCase):
         cls.endpoint = cls.create_bare_minimum_endpoint(project=cls.project)
 
     def test_run_with_unique_mock_calls_service_method(self):
-        import ipdb; ipdb.set_trace(context=8)
         self.task(self.endpoint.path, self.project.id)
 
         self.assertTrue(self.mock_service)
