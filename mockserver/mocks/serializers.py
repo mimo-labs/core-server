@@ -48,17 +48,21 @@ class ParamsSerializer(serializers.ModelSerializer):
 
 
 class MockSerializer(serializers.ModelSerializer):
-    path = serializers.CharField(allow_null=True)
-    verb = serializers.PrimaryKeyRelatedField(queryset=HttpVerb.objects.all(), allow_null=True)
+    path = serializers.CharField(allow_null=True, required=False, default=None)
+    verb = serializers.PrimaryKeyRelatedField(
+        queryset=HttpVerb.objects.all(),
+        allow_null=True,
+        required=False,
+    )
 
-    headers = HeaderSerializer(many=True)
-    mock_content = serializers.JSONField(write_only=True)
-    mock_params = serializers.JSONField(write_only=True)
+    headers = HeaderSerializer(many=True, required=False)
+    mock_content = serializers.JSONField(write_only=True, required=False, default=dict)
+    mock_params = serializers.JSONField(write_only=True, required=False, default=dict)
 
     project_id = serializers.CharField(allow_null=True, write_only=True, source='project')
 
     def create(self, validated_data):
-        headers = validated_data.pop('headers')
+        headers = validated_data.pop('headers', [])
         content = validated_data.pop('mock_content')
         params = validated_data.pop('mock_params')
         path_name = validated_data.pop('path')
