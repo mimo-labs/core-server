@@ -56,9 +56,13 @@ class MockSerializer(serializers.ModelSerializer):
     )
 
     headers = HeaderSerializer(many=True, required=False)
+    # read fields
+    content = serializers.SerializerMethodField()
+    params = serializers.SerializerMethodField()
+
+    # write fields
     mock_content = serializers.JSONField(write_only=True, required=False, default=dict)
     mock_params = serializers.JSONField(write_only=True, required=False, default=dict)
-
     project_id = serializers.CharField(allow_null=True, write_only=True, source='project')
 
     def create(self, validated_data):
@@ -94,6 +98,12 @@ class MockSerializer(serializers.ModelSerializer):
             mock_params.save()
 
         return mock
+
+    def get_content(self, obj):
+        return obj.content.get().content
+
+    def get_params(self, obj):
+        return obj.params.get().content
 
     class Meta:
         model = Mock
