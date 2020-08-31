@@ -31,6 +31,21 @@ class HeaderSerializer(serializers.ModelSerializer):
         }
 
 
+class HeaderMockSerializer(serializers.ModelSerializer):
+    header_type = serializers.CharField(source="header_type.name")
+
+    class Meta:
+        model = Header
+        fields = (
+            'header_type',
+            'value',
+        )
+        read_only_fields = (
+            'header_type',
+            'value',
+        )
+
+
 class ContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content
@@ -55,18 +70,19 @@ class MockSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    headers = HeaderSerializer(many=True, required=False)
     # read fields
     content = serializers.SerializerMethodField()
     params = serializers.SerializerMethodField()
+    headers = HeaderMockSerializer(many=True, read_only=True)
 
     # write fields
     mock_content = serializers.JSONField(write_only=True, required=False, default=dict)
     mock_params = serializers.JSONField(write_only=True, required=False, default=dict)
+    mock_headers = HeaderSerializer(write_only=True, many=True, required=False)
     project_id = serializers.CharField(allow_null=True, write_only=True, source='project')
 
     def create(self, validated_data):
-        headers = validated_data.pop('headers', [])
+        headers = validated_data.pop('mock_headers', [])
         content = validated_data.pop('mock_content')
         params = validated_data.pop('mock_params')
         path_name = validated_data.pop('path')
@@ -115,6 +131,7 @@ class MockSerializer(serializers.ModelSerializer):
             'verb',
             'status_code',
             'is_active',
+            'mock_headers',
             'mock_content',
             'mock_params',
             'content',
@@ -125,6 +142,7 @@ class MockSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'content',
             'params',
+            'headers',
         )
 
 
