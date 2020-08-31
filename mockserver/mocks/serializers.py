@@ -62,6 +62,23 @@ class ParamsSerializer(serializers.ModelSerializer):
         )
 
 
+class MockSlimSerializer(serializers.ModelSerializer):
+    path = serializers.CharField(source="path.path")
+    verb = serializers.CharField(source="verb.name")
+
+    class Meta:
+        model = Mock
+        fields = (
+            'id',
+            'title',
+            'path',
+            'verb',
+            'status_code',
+            'is_active',
+            'is_complete',
+        )
+
+
 class MockSerializer(serializers.ModelSerializer):
     path = serializers.CharField(allow_null=True, required=False, default=None)
     verb = serializers.PrimaryKeyRelatedField(
