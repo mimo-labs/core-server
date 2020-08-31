@@ -121,6 +121,13 @@ class MockSerializer(serializers.ModelSerializer):
     def get_params(self, obj):
         return obj.params.get().content
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if rep.get('verb'):
+            verb = HttpVerb.objects.get(id=rep['verb'])
+            rep['verb'] = HttpVerbMockSerializer(verb).data
+        return rep
+
     class Meta:
         model = Mock
         depth = 1
@@ -158,6 +165,15 @@ class HeaderTypeSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'organization',
+        )
+
+
+class HttpVerbMockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HttpVerb
+        fields = (
+            'id',
+            'name',
         )
 
 
