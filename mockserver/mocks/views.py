@@ -11,6 +11,7 @@ from mocks.models import (
 )
 from mocks.serializers import (
     MockSerializer,
+    MockSlimSerializer,
     HeaderTypeSerializer,
     HttpVerbSerializer,
     CategorySerializer,
@@ -25,8 +26,13 @@ from tenants.permissions import (
 
 class MockViewset(viewsets.ModelViewSet):
     queryset = Mock.objects.all()
-    serializer_class = MockSerializer
     permission_classes = (IsAuthenticated, IsOwnProject)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return MockSlimSerializer
+        else:
+            return MockSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()

@@ -2,6 +2,8 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 from common.tests.testcases import APIViewSetTestCase
+from mocks.serializers import MockSlimSerializer, MockSerializer
+from mocks.views import MockViewset
 from tenants.models import Project, Organization
 
 
@@ -10,6 +12,7 @@ class MockViewSetTestCase(APIViewSetTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.token = Token.objects.get(user=cls.tenant)
+        cls.viewset = MockViewset()
 
     def test_unauthenticated_detail_request_is_disallowed(self):
         url = reverse('v1:mock-detail', kwargs={'pk': self.mock.id})
@@ -83,6 +86,20 @@ class MockViewSetTestCase(APIViewSetTestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
+
+    def test_list_returns_slim_serializer(self):
+        self.viewset.action = "list"
+
+        ser = self.viewset.get_serializer_class()
+
+        self.assertIs(ser, MockSlimSerializer)
+
+    def test_non_list_returns_full_serializer(self):
+        self.viewset.action = "create"
+
+        ser = self.viewset.get_serializer_class()
+
+        self.assertIs(ser, MockSerializer)
 
 
 class CategoryViewSetTestCase(APIViewSetTestCase):
