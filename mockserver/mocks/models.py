@@ -132,6 +132,7 @@ class Mock(DateAwareModel):
         if self.is_active:
             active_mocks = Mock.objects.exclude(id=self.pk).filter(
                 path=self.path,
+                verb=self.verb,
                 is_active=True
             )
 
