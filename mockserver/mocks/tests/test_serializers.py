@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework import serializers
 
 from common.tests.mixins import MockTestMixin
-from mocks.serializers import EndpointSerializer
+from mocks.serializers import EndpointSerializer, MockSerializer
 
 
 class EndpointSerializerValidationTestCase(MockTestMixin, TestCase):
@@ -49,3 +49,29 @@ class EndpointSerializerValidationTestCase(MockTestMixin, TestCase):
         serializer = self.serializer(data=endpoint_data)
 
         self.assertTrue(serializer.is_valid())
+
+
+class MockSerializerTestCase(MockTestMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.serializer = MockSerializer
+        cls.organization = cls.create_bare_minimum_organization()
+
+    def setUp(self):
+        self.mock = self.create_bare_minimum_mock()
+
+    def test_serializer_without_verb_is_represented_as_is(self):
+        serializer = self.serializer()
+        self.mock.verb = None
+
+        rep = serializer.to_representation(self.mock)
+
+        self.assertIsNone(rep['verb'])
+
+    def test_serializer_with_verb_is_represented_as_object(self):
+        serializer = self.serializer()
+        self.mock.verb = self.create_bare_minimum_verb(self.organization)
+
+        rep = serializer.to_representation(self.mock)
+
+        self.assertIsInstance(rep['verb'], dict)
