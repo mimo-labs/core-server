@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from common.tests.mixins import MockTestMixin
-from mocks.models import Mock
+from mocks.models import Mock, HttpVerb
 
 
 class MockTestCase(MockTestMixin, TestCase):
@@ -56,6 +56,20 @@ class MockTestCase(MockTestMixin, TestCase):
         mock = self.create_bare_minimum_mock()
 
         Mock.objects.create(path=mock.path, verb=mock.verb, is_active=False)
+        mock.refresh_from_db()
+
+        self.assertTrue(mock.is_active)
+
+    def test_new_active_mock_same_path_different_verb_leaves_existing_mock_active(self):
+        organization = self.create_bare_minimum_organization()
+        post_verb = HttpVerb.objects.create(name="POST", organization=organization)
+        mock = self.create_bare_minimum_mock()
+        mock.verb = post_verb
+        mock.is_active = True
+        mock.save()
+        verb = self.create_bare_minimum_verb(organization)
+
+        Mock.objects.create(path=mock.path, verb=verb, is_active=True)
         mock.refresh_from_db()
 
         self.assertTrue(mock.is_active)
