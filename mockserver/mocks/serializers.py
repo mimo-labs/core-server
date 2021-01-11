@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from tenants.serializers import OrganizationResourceSerializer
 from mocks.models import (
     Mock,
     HeaderType,
@@ -66,6 +67,11 @@ class MockSlimSerializer(serializers.ModelSerializer):
     path = serializers.CharField(source="path.path")
     verb = serializers.CharField(source="verb.name")
 
+    # read fields
+    content = serializers.SerializerMethodField()
+    params = serializers.SerializerMethodField()
+    headers = HeaderMockSerializer(many=True, read_only=True)
+
     class Meta:
         model = Mock
         fields = (
@@ -76,7 +82,24 @@ class MockSlimSerializer(serializers.ModelSerializer):
             'status_code',
             'is_active',
             'is_complete',
+
+            'content',
+            'params',
+            'headers',
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        verb_serializer = HttpVerbMockSerializer(instance.verb)
+        data['verb'] = verb_serializer.data
+
+        return data
+
+    def get_content(self, obj):
+        return obj.content.get().content
+
+    def get_params(self, obj):
+        return obj.params.get().content
 
 
 class MockSerializer(serializers.ModelSerializer):
@@ -207,6 +230,13 @@ class HttpVerbSerializer(serializers.ModelSerializer):
             'name',
             'organization',
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        org_serializer = OrganizationResourceSerializer(instance.organization)
+        data['organization'] = org_serializer.data
+
+        return data
 
 
 class CategorySerializer(serializers.ModelSerializer):

@@ -26,6 +26,13 @@ class ProjectSerializer(serializers.ModelSerializer):
             'organization',
         )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        org_serializer = OrganizationResourceSerializer(instance.organization)
+        data['organization'] = org_serializer.data
+
+        return data
+
 
 class OrganizationProfileThinSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,6 +129,25 @@ class OrganizationSerializer(serializers.ModelSerializer):
         membership.save()
 
         return organization
+
+
+class OrganizationResourceSerializer(serializers.ModelSerializer):
+    profile = OrganizationProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Organization
+        fields = (
+            'id',
+            'name',
+            'uuid',
+            'profile',
+        )
+        read_only_fields = (
+            'is_playground',
+            'name',
+            'uuid',
+            'profile',
+        )
 
 
 class OrganizationInviteSerializer(serializers.ModelSerializer):
