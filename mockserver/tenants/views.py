@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import (
     viewsets,
+    mixins,
     status
 )
 from rest_framework.decorators import action
@@ -54,7 +55,10 @@ class ProjectViewset(viewsets.ModelViewSet):
         return qs
 
 
-class TenantViewSet(viewsets.ModelViewSet):
+class TenantViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
     filter_class = TenantFilter
