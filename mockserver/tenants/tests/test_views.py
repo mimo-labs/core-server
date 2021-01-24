@@ -1,4 +1,3 @@
-from unittest import skip
 from unittest.mock import (
     patch,
     Mock
@@ -7,7 +6,7 @@ from unittest.mock import (
 from rest_framework.reverse import reverse
 
 from common.tests.testcases import APIViewSetTestCase
-from tenants.models import OrganizationMembership, Organization
+from tenants.models import OrganizationMembership
 
 
 class OrganizationViewSetTestCase(APIViewSetTestCase):
