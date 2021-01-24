@@ -36,6 +36,12 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
             self.assertEqual(response.status_code, 401)
 
+        with self.subTest('tenants should be disallowed'):
+            url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 401)
+
         with self.subTest('promotion should be disallowed'):
             url = reverse('v1:organization-member-promotion', kwargs={'pk': self.organization.pk})
             response = self.client.post(url)
@@ -91,6 +97,12 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
             self.assertEqual(response.status_code, 403)
 
+        with self.subTest('organization tenants should be disallowed'):
+            url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 403)
+
     def test_authenticated_list_requests_are_allowed(self):
         url = reverse('v1:organization-list')
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
@@ -106,6 +118,14 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
     def test_authenticated_member_detail_is_allowed(self):
         url = reverse('v1:organization-detail', kwargs={'pk': self.organization.pk})
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_authenticated_member_tenants_list_is_allowed(self):
+        url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
 
         response = self.client.get(url)
@@ -228,29 +248,6 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, 200)
-
-
-@skip('Reworked views. Pending to reimplement correct tests elsewhere')
-class TenantViewsetTestCase(APIViewSetTestCase):
-    def setUp(self):
-        super().setUp()
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
-
-    def test_get_no_organization_errors(self):
-        url = reverse('v1:tenant-list')
-
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 400)
-
-    def test_get_organization_param_returns_tenants(self):
-        url = reverse('v1:tenant-list')
-
-        response = self.client.get(url, {'organization_id': self.organization.id})
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['id'], self.tenant.id)
 
 
 
