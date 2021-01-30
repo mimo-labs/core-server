@@ -122,7 +122,7 @@ class Organization(DateAwareModel):
 
 
 class Tenant(DateAwareModel, User):
-    pass
+    deleted = models.BooleanField(default=False)
 
 
 class OrganizationInvite(DateAwareModel):

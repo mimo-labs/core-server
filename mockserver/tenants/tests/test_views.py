@@ -248,6 +248,50 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_tenants_view_does_not_return_deleted_tenants(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+        self.tenant.deleted = True
+        self.tenant.save()
+        url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(0, len(response.json()))
+
+
+class TenantViewsetTestCase(APIViewSetTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+
+    def test_delete_on_deleted_tenant_returns_not_found(self):
+        tenant = self.create_bare_minimum_tenant()
+        tenant.deleted = True
+        tenant.save()
+        url = reverse('v1:tenant-detail', kwargs={'pk': tenant.pk})
+
+        response = self.client.delete(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_delete_on_tenant_flags_as_deleted(self):
+        url = reverse('v1:tenant-detail', kwargs={'pk': self.tenant.pk})
+
+        response = self.client.delete(url)
+        self.tenant.refresh_from_db()
+
+        self.assertTrue(self.tenant.deleted)
+        self.assertEqual(204, response.status_code)
+
+    def test_update_on_deleted_tenant_returns_not_found(self):
+        tenant = self.create_bare_minimum_tenant()
+        tenant.deleted = True
+        tenant.save()
+        url = reverse('v1:tenant-detail', kwargs={'pk': tenant.pk})
+
+        response = self.client.put(url)
+
+        self.assertEqual(404, response.status_code)
 
 
 class ProjectViewsetTestCase(APIViewSetTestCase):

@@ -11,7 +11,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from tenants.filters import TenantFilter
 from tenants.models import (
     Tenant,
     Organization,
@@ -59,14 +58,17 @@ class TenantViewSet(mixins.CreateModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
-    queryset = Tenant.objects.all()
+    queryset = Tenant.objects.filter(deleted=False)
     serializer_class = TenantSerializer
-    filter_class = TenantFilter
 
     def get_permissions(self):
         if self.action == 'create':
             return (TenantPermission(),)
         return (IsAuthenticated(), TenantPermission(),)
+
+    def perform_destroy(self, instance):
+        instance.deleted = True
+        instance.save()
 
     @action(detail=False, methods=['GET', ])
     def me(self, request):
@@ -185,6 +187,6 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET'])
     def tenants(self, request, pk=None):
         organization: Organization = self.get_object()
-        tenants_ser = TenantSerializer(organization.users.all(), many=True)
+        tenants_ser = TenantSerializer(organization.users.filter(deleted=False), many=True)
 
         return JsonResponse(tenants_ser.data, safe=False)
