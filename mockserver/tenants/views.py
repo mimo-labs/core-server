@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import (
     viewsets,
+    mixins,
     status
 )
 from rest_framework.decorators import action
@@ -54,7 +55,10 @@ class ProjectViewset(viewsets.ModelViewSet):
         return qs
 
 
-class TenantViewSet(viewsets.ModelViewSet):
+class TenantViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
     filter_class = TenantFilter
@@ -78,7 +82,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'create']:
             return [IsAuthenticated()]
-        elif self.action == 'retrieve':
+        elif self.action in ('retrieve', 'tenants'):
             return [IsAuthenticated(), IsOrganizationMemberPermission()]
         elif self.action in ('destroy', 'member_promotion', 'member_demotion'):
             return [IsAuthenticated(), IsOrganizationOwnerPermission()]
@@ -177,3 +181,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         serializer.save()
 
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def tenants(self, request, pk=None):
+        organization: Organization = self.get_object()
+        tenants_ser = TenantSerializer(organization.users.all(), many=True)
+
+        return JsonResponse(tenants_ser.data, safe=False)

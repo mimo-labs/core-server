@@ -6,7 +6,7 @@ from unittest.mock import (
 from rest_framework.reverse import reverse
 
 from common.tests.testcases import APIViewSetTestCase
-from tenants.models import OrganizationMembership, Organization
+from tenants.models import OrganizationMembership
 
 
 class OrganizationViewSetTestCase(APIViewSetTestCase):
@@ -32,6 +32,12 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
         with self.subTest('profile should be disallowed'):
             url = reverse('v1:organization-profile', kwargs={'pk': self.organization.pk})
             response = self.client.put(url)
+
+            self.assertEqual(response.status_code, 401)
+
+        with self.subTest('tenants should be disallowed'):
+            url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
+            response = self.client.get(url)
 
             self.assertEqual(response.status_code, 401)
 
@@ -90,6 +96,12 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
             self.assertEqual(response.status_code, 403)
 
+        with self.subTest('organization tenants should be disallowed'):
+            url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 403)
+
     def test_authenticated_list_requests_are_allowed(self):
         url = reverse('v1:organization-list')
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
@@ -105,6 +117,14 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
 
     def test_authenticated_member_detail_is_allowed(self):
         url = reverse('v1:organization-detail', kwargs={'pk': self.organization.pk})
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_authenticated_member_tenants_list_is_allowed(self):
+        url = reverse('v1:organization-tenants', kwargs={'pk': self.organization.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
 
         response = self.client.get(url)
@@ -229,36 +249,6 @@ class OrganizationViewSetTestCase(APIViewSetTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TenantViewsetTestCase(APIViewSetTestCase):
-    def setUp(self):
-        super().setUp()
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.tenant.user_ptr.auth_token}')
-
-    def test_get_no_organization_errors(self):
-        url = reverse('v1:tenant-list')
-
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 400)
-
-    def test_get_organization_param_returns_tenants(self):
-        url = reverse('v1:tenant-list')
-
-        response = self.client.get(url, {'organization_id': self.organization.id})
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['id'], self.tenant.id)
-
-    def test_get_nonexistent_organization_returns_empty(self):
-        url = reverse('v1:tenant-list')
-        last_id = Organization.objects.last().id
-
-        response = self.client.get(url, {'organization_id': last_id + 1})
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 0)
-
 
 class ProjectViewsetTestCase(APIViewSetTestCase):
     def setUp(self):
@@ -282,12 +272,3 @@ class ProjectViewsetTestCase(APIViewSetTestCase):
         self.assertEqual(response.status_code, 200)
         # Dummy project and custom created project
         self.assertEqual(len(response.json()), 2)
-
-    def test_list_with_nonexistent_organization_returns_empty(self):
-        url = reverse('v1:tenant-list')
-        last_id = Organization.objects.last().id
-
-        response = self.client.get(url, {'organization_id': last_id + 1})
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 0)
