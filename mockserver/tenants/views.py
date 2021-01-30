@@ -11,7 +11,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from tenants.filters import TenantFilter
 from tenants.models import (
     Tenant,
     Organization,
