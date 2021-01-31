@@ -62,6 +62,13 @@ class OrganizationMembership(DateAwareModel):
 
 
 class OrganizationProfile(models.Model):
+    organization = models.OneToOneField(
+        'tenants.Organization',
+        related_name="public_profile",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
     public_name = models.CharField(max_length=255)
     description = models.TextField(null=True)
     technologies = models.ManyToManyField(
@@ -96,18 +103,29 @@ class Organization(DateAwareModel):
     )
     profile = models.OneToOneField(
         'tenants.OrganizationProfile',
-        related_name='organization',
         on_delete=models.CASCADE,
+        related_name="deprecated_org",
+        null=True
+    )
+    feature_flags = models.OneToOneField(
+        'tenants.FeatureFlag',
+        on_delete=models.CASCADE,
+        related_name="deprecated_org",
         null=True
     )
 
     def save(self, **kwargs):
-        if not self.pk:
-            self.profile = OrganizationProfile.objects.create(
+        is_new  = not self.pk
+        super(Organization, self).save(**kwargs)
+
+        if is_new:
+            OrganizationProfile.objects.create(
                 organization=self,
                 public_name=self.name
             )
-        return super(Organization, self).save(**kwargs)
+            FeatureFlag.objects.create(
+                organization=self,
+            )
 
     @property
     def member_count(self):
@@ -119,6 +137,15 @@ class Organization(DateAwareModel):
 
     def __str__(self):
         return f"{self.name} ({self.uuid})"
+
+
+class FeatureFlag(DateAwareModel):
+    organization = models.OneToOneField(
+        'tenants.Organization',
+        related_name="featureflag",
+        on_delete=models.CASCADE,
+        null=True
+    )
 
 
 class Tenant(DateAwareModel, User):
