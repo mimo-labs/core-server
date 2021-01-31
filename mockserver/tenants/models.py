@@ -115,7 +115,7 @@ class Organization(DateAwareModel):
     )
 
     def save(self, **kwargs):
-        is_new  = not self.pk
+        is_new = not self.pk
         super(Organization, self).save(**kwargs)
 
         if is_new:
