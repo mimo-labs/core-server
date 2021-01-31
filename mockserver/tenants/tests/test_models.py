@@ -5,18 +5,36 @@ from django.test import TestCase
 from common.tests.mixins import MockTestMixin
 from tenants.models import (
     OrganizationInvite,
-    OrganizationProfile
+    OrganizationProfile,
+    FeatureFlag
 )
 
 
 class OrganizationModelTestCase(MockTestMixin, TestCase):
-    def test_new_organization_creates_profile(self):
+    def test_organization_handles_profile(self):
         organization = self.create_bare_minimum_organization()
 
-        self.assertIsNotNone(organization.profile)
-        self.assertEqual(OrganizationProfile.objects.count(), 1)
-        self.assertEqual(organization.profile.public_name, organization.name)
-        self.assertEqual(organization.profile.organization.pk, organization.pk)
+        with self.subTest("automatically creates profile"):
+            self.assertIsNotNone(organization.profile)
+            self.assertEqual(OrganizationProfile.objects.count(), 1)
+            self.assertEqual(organization.profile.public_name, organization.name)
+            self.assertEqual(organization.profile.organization.pk, organization.pk)
+        with self.subTest("automatically deletes profile"):
+            organization.delete()
+
+            self.assertEqual(OrganizationProfile.objects.count(), 0)
+
+
+    def test_organization_handles_feature_flags(self):
+        organization = self.create_bare_minimum_organization()
+
+        with self.subTest("automatically creates feature flag"):
+            self.assertIsNotNone(organization.feature_flags)
+            self.assertEqual(FeatureFlag.objects.count(), 1)
+        with self.subTest("automatically deletes feature flag"):
+            organization.delete()
+
+            self.assertEqual(FeatureFlag.objects.count(), 0)
 
 
 class OrganizationInviteModelTestCase(MockTestMixin, TestCase):
