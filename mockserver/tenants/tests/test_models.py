@@ -15,10 +15,10 @@ class OrganizationModelTestCase(MockTestMixin, TestCase):
         organization = self.create_bare_minimum_organization()
 
         with self.subTest("automatically creates profile"):
-            self.assertIsNotNone(organization.public_profile)
+            self.assertIsNotNone(organization.profile)
             self.assertEqual(OrganizationProfile.objects.count(), 1)
-            self.assertEqual(organization.public_profile.public_name, organization.name)
-            self.assertEqual(organization.public_profile.organization.pk, organization.pk)
+            self.assertEqual(organization.profile.public_name, organization.name)
+            self.assertEqual(organization.profile.organization.pk, organization.pk)
         with self.subTest("automatically deletes profile"):
             organization.delete()
 
@@ -29,7 +29,7 @@ class OrganizationModelTestCase(MockTestMixin, TestCase):
         organization = self.create_bare_minimum_organization()
 
         with self.subTest("automatically creates feature flag"):
-            self.assertIsNotNone(organization.featureflag)
+            self.assertIsNotNone(organization.feature_flags)
             self.assertEqual(FeatureFlag.objects.count(), 1)
         with self.subTest("automatically deletes feature flag"):
             organization.delete()

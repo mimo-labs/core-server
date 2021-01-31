@@ -64,7 +64,7 @@ class OrganizationMembership(DateAwareModel):
 class OrganizationProfile(models.Model):
     organization = models.OneToOneField(
         'tenants.Organization',
-        related_name="public_profile",
+        related_name="profile",
         on_delete=models.CASCADE,
         null=True
     )
@@ -101,18 +101,6 @@ class Organization(DateAwareModel):
         through=OrganizationMembership,
         blank=True
     )
-    profile = models.OneToOneField(
-        'tenants.OrganizationProfile',
-        on_delete=models.CASCADE,
-        related_name="deprecated_org",
-        null=True
-    )
-    feature_flags = models.OneToOneField(
-        'tenants.FeatureFlag',
-        on_delete=models.CASCADE,
-        related_name="deprecated_org",
-        null=True
-    )
 
     def save(self, **kwargs):
         is_new = not self.pk
@@ -142,7 +130,7 @@ class Organization(DateAwareModel):
 class FeatureFlag(DateAwareModel):
     organization = models.OneToOneField(
         'tenants.Organization',
-        related_name="featureflag",
+        related_name="feature_flags",
         on_delete=models.CASCADE,
         null=True
     )
